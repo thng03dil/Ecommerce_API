@@ -1,0 +1,15 @@
+D:\Work\Project\E-commerce_API\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.deps.json
+D:\Work\Project\E-commerce_API\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.dll
+D:\Work\Project\E-commerce_API\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.pdb
+D:\Work\Project\E-commerce_API\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Domain.dll
+D:\Work\Project\E-commerce_API\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Domain.pdb
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.csproj.AssemblyReference.cache
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.AssemblyInfoInputs.cache
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.AssemblyInfo.cs
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.csproj.CoreCompileInputs.cache
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerc.C5F54E74.Up2Date
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.dll
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\refint\Ecommerce.Application.dll
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.pdb
+D:\Work\Project\E-commerce_API\Ecommerce.Application\obj\Debug\net8.0\ref\Ecommerce.Application.dll
