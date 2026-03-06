@@ -1,3 +1,4 @@
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,9 @@ builder.Services.AddControllers();
 // Đăng ký DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Đăng ký Interface
+builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

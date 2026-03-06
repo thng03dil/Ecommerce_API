@@ -964,7 +964,8 @@
       },
       "Ecommerce.Application/1.0.0": {
         "dependencies": {
-          "Ecommerce.Domain": "1.0.0"
+          "Ecommerce.Domain": "1.0.0",
+          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.13"
         },
         "runtime": {
           "Ecommerce.Application.dll": {}

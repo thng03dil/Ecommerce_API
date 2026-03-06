@@ -47,6 +47,29 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Các loại smartphone mới nhất",
+                            Name = "Điện thoại",
+                            slug = "dien-thoai"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Máy tính xách tay làm việc và chơi game",
+                            Name = "Laptop",
+                            slug = "laptop"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Tai nghe, sạc, cáp...",
+                            Name = "Phụ kiện",
+                            slug = "phu-kien"
+                        });
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Entities.Product", b =>
@@ -81,7 +104,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("StockQuantity")
+                    b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -89,6 +112,80 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "iPhone 15 Pro với chip A17 Pro và camera nâng cấp",
+                            ImageUrl = "https://example.com/images/iphone15pro.jpg",
+                            IsActive = true,
+                            Name = "iPhone 15 Pro",
+                            Price = 25000000m,
+                            Stock = 20
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Samsung flagship với AI và camera 200MP",
+                            ImageUrl = "https://example.com/images/galaxy-s24.jpg",
+                            IsActive = true,
+                            Name = "Samsung Galaxy S24",
+                            Price = 22000000m,
+                            Stock = 15
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoryId = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Laptop mỏng nhẹ chip Apple M2 hiệu năng cao",
+                            ImageUrl = "https://example.com/images/macbook-air-m2.jpg",
+                            IsActive = true,
+                            Name = "MacBook Air M2",
+                            Price = 28000000m,
+                            Stock = 10
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoryId = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Laptop cao cấp màn hình InfinityEdge",
+                            ImageUrl = "https://example.com/images/dell-xps13.jpg",
+                            IsActive = true,
+                            Name = "Dell XPS 13",
+                            Price = 32000000m,
+                            Stock = 8
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoryId = 3,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tai nghe không dây chống ồn chủ động",
+                            ImageUrl = "https://example.com/images/airpods-pro2.jpg",
+                            IsActive = true,
+                            Name = "AirPods Pro 2",
+                            Price = 6000000m,
+                            Stock = 30
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CategoryId = 3,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Củ sạc nhanh cho điện thoại và laptop",
+                            ImageUrl = "https://example.com/images/charger-65w.jpg",
+                            IsActive = true,
+                            Name = "Sạc nhanh 65W",
+                            Price = 500000m,
+                            Stock = 50
+                        });
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Entities.Product", b =>
@@ -96,7 +193,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.HasOne("Ecommerce.Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");

@@ -28,7 +28,7 @@ namespace Ecommerce.Domain.Entities
         public decimal Price { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Số lượng tồn kho không được là số âm")]
-        public int StockQuantity { get; set; }
+        public int Stock { get; set; }
 
         [Url(ErrorMessage = "Đường dẫn ảnh không hợp lệ")]
         public string? ImageUrl { get; set; }
