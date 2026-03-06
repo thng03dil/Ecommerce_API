@@ -12,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Interface
+// Register Interface for DbContext
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
 
 // Register Service
