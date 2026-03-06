@@ -1,4 +1,4 @@
-﻿using Ecommerce_API.DTOs;
+﻿using Ecommerce_API.DTOs.ProductDtos;
 
 namespace Ecommerce_API.Services.Interfaces
 {

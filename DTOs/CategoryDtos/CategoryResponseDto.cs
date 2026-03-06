@@ -1,5 +1,4 @@
-﻿
-namespace Ecommerce_API.DTOs
+﻿namespace Ecommerce_API.DTOs.CategoryDtos
 {
     public class CategoryResponseDto
     {

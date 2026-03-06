@@ -1,8 +1,8 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-namespace Ecommerce_API.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Ecommerce_API.DTOs.CategoryDtos
 {
-    public class CategoryCreateDto
+    public class CategoryUpdateDto
     {
         [Required]
         [StringLength(100)]

@@ -1,4 +1,4 @@
-﻿using Ecommerce_API.DTOs;
+﻿using Ecommerce_API.DTOs.CategoryDtos;
 namespace Ecommerce_API.Services.Interfaces
 {
     public interface ICategoryService

@@ -142,3 +142,4 @@ D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\refint\Ecommerce_API.dll
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\Ecommerce_API.pdb
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\Ecommerce_API.genruntimeconfig.cache
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\ref\Ecommerce_API.dll
+D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\Ecommerce_API.sourcelink.json

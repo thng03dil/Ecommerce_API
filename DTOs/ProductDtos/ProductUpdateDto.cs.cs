@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Ecommerce_API.DTOs
+namespace Ecommerce_API.DTOs.ProductDtos
 {
     public class ProductUpdateDto
     {
         [Required]
-        public int CategoryId { get; set; } 
+        public int CategoryId { get; set; }
 
         [Required]
         [MaxLength(150)]
