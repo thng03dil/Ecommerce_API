@@ -10,7 +10,7 @@ using Ecommerce.Application.DTOs.ProductDTOs;
 
 namespace Ecommerce.Application.Services
 {
-    internal class ProductService : IProductService
+    public class ProductService : IProductService
     {
         private readonly IAppDbContext _context;
         public ProductService(IAppDbContext context)

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Application.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly IAppDbContext _context;
 

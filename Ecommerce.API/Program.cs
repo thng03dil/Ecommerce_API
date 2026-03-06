@@ -1,18 +1,23 @@
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Application.Services;
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Đăng ký Controller
+// Register Controller
 builder.Services.AddControllers();
 
-// Đăng ký DbContext
+// Register DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Đăng ký Interface
+// Register Interface
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
+
+// Register Service
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
