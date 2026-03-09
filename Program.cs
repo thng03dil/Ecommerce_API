@@ -1,13 +1,12 @@
 using Ecommerce_API.Data;
+using Ecommerce_API.Middleware;
+using Ecommerce_API.Services.Implementations.CategoryImplementations;
+using Ecommerce_API.Services.Implementations.ProductImplementations;
 using Ecommerce_API.Services.Interfaces;
-using Ecommerce_API.Services.Implementations;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using Ecommerce_API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using System.Reflection;
-using Ecommerce_API.Validators;
-using Ecommerce_API.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

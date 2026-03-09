@@ -2,10 +2,11 @@
 using Ecommerce_API.DTOs.ProductDtos;
 using Ecommerce_API.Helpers;
 using Ecommerce_API.Models;
+using Ecommerce_API.Services.Implementations.ProductImplementations;
 using Ecommerce_API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce_API.Services.Implementations
+namespace Ecommerce_API.Services.Implementations.ProductImplementations
 {
     public class ProductService : IProductService
     {
@@ -21,7 +22,7 @@ namespace Ecommerce_API.Services.Implementations
             var query = _context.Products
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted);
-                
+
 
             return await query
                 .Include(p => p.Category)
@@ -36,7 +37,7 @@ namespace Ecommerce_API.Services.Implementations
                     Stock = p.Stock,
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category!.Name
-                    
+
                 })
                 .ToListAsync();
         }
@@ -66,12 +67,10 @@ namespace Ecommerce_API.Services.Implementations
         public async Task<ProductResponseDto> CreateAsync(ProductCreateDto dto)
         {
             // Validate Category exist
-            var categoryExists = await _context.Categories
-                .AsNoTracking()
-                .AnyAsync(c => c.Id == dto.CategoryId);
+            var category = await _context.Categories
+        .FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
 
-            if (!categoryExists)
-                throw new Exception("Category not found");
+            if (category == null) throw new Exception("Category not found");
 
             var product = new Product
             {
@@ -84,8 +83,6 @@ namespace Ecommerce_API.Services.Implementations
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-
-            var category = await _context.Categories.FindAsync(dto.CategoryId);
 
             return new ProductResponseDto
             {

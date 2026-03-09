@@ -5,7 +5,7 @@ using Ecommerce_API.Models;
 using Ecommerce_API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce_API.Services.Implementations
+namespace Ecommerce_API.Services.Implementations.CategoryImplementations
 {
     public class CategoryService : ICategoryService
     {
@@ -21,7 +21,7 @@ namespace Ecommerce_API.Services.Implementations
             var query = _context.Categories
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted);
-                
+
 
             return await query
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
@@ -44,7 +44,7 @@ namespace Ecommerce_API.Services.Implementations
                 .Include(c => c.Products)
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
 
-            if (category == null) 
+            if (category == null)
                 throw new Exception("Category not found");
 
             return new CategoryResponseDto
@@ -75,7 +75,7 @@ namespace Ecommerce_API.Services.Implementations
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                Slug = category.Slug,                                                        
+                Slug = category.Slug,
                 ProductCount = 0
             };
         }
@@ -83,7 +83,6 @@ namespace Ecommerce_API.Services.Implementations
         public async Task UpdateAsync(int id, CategoryUpdateDto dto)
         {
             var category = await _context.Categories
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
             if (category == null)
                 throw new Exception("Category not found");
