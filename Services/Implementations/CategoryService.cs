@@ -5,7 +5,7 @@ using Ecommerce_API.Models;
 using Ecommerce_API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce_API.Services.Implementations.CategoryImplementations
+namespace Ecommerce_API.Services.Implementations
 {
     public class CategoryService : ICategoryService
     {

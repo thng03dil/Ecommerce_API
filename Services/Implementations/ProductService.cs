@@ -2,11 +2,10 @@
 using Ecommerce_API.DTOs.ProductDtos;
 using Ecommerce_API.Helpers;
 using Ecommerce_API.Models;
-using Ecommerce_API.Services.Implementations.ProductImplementations;
 using Ecommerce_API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce_API.Services.Implementations.ProductImplementations
+namespace Ecommerce_API.Services.Implementations
 {
     public class ProductService : IProductService
     {

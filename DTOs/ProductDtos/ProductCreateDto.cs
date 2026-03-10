@@ -9,7 +9,6 @@ namespace Ecommerce_API.DTOs.ProductDtos
         public decimal Price { get; set; }
         public string? Description { get; set; }
 
-        [Range(0, int.MaxValue)]
         public int Stock { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 using Ecommerce_API.Data;
 using Ecommerce_API.Middleware;
-using Ecommerce_API.Services.Implementations.CategoryImplementations;
-using Ecommerce_API.Services.Implementations.ProductImplementations;
+using Ecommerce_API.Services.Implementations;
 using Ecommerce_API.Services.Interfaces;
 using Ecommerce_API.Validators;
 using FluentValidation;

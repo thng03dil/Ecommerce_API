@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260310050534_InitialCreate")]
+    [Migration("20260310074651_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -129,13 +129,18 @@ namespace Ecommerce_API.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Stock")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Product_Stock_Min", "[Stock] >= 0");
+                        });
 
                     b.HasData(
                         new

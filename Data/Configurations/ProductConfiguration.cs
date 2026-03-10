@@ -22,6 +22,15 @@ namespace Ecommerce_API.Data.Configurations
             builder.Property(x => x.Price)
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(x => x.Stock)
+                .IsRequired()
+                .HasColumnType("int")       
+                .HasDefaultValue(0);
+            builder.ToTable(t => t.HasCheckConstraint(
+                "CK_Product_Stock_Min", 
+                "[Stock] >= 0"
+                ));
+
             builder.HasOne(x => x.Category)
                 .WithMany(x => x.Products)
                 .HasForeignKey(x => x.CategoryId);
