@@ -24,6 +24,7 @@ namespace Ecommerce_API.Services.Implementations.CategoryImplementations
 
 
             return await query
+                .OrderBy(c => c.Id)
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Select(c => new CategoryResponseDto

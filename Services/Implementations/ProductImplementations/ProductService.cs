@@ -26,6 +26,7 @@ namespace Ecommerce_API.Services.Implementations.ProductImplementations
 
             return await query
                 .Include(p => p.Category)
+                .OrderBy(p => p.Id)
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Select(p => new ProductResponseDto
