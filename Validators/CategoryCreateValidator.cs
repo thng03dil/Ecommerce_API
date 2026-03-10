@@ -13,7 +13,7 @@ namespace Ecommerce_API.Validators
             _context = context;
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Category name cannot be empty")
-                .MaximumLength(100).WithMessage("Category name must not exceed 300 characters  ");
+                .MaximumLength(100).WithMessage("Category name must not exceed 300 characters");
 
             RuleFor(x => x.Slug)
                 .NotEmpty().WithMessage("Slug cannot be empty ")
@@ -25,7 +25,7 @@ namespace Ecommerce_API.Validators
                 .WithMessage("Slug already existed ");
 
             RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Description must not exceed 300 characters  ") ;
+                .MaximumLength(500).WithMessage("Description must not exceed 500 characters  ") ;
         }
     }
 }
