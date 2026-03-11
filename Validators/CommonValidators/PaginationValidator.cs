@@ -1,6 +1,6 @@
 ﻿using Ecommerce_API.Helpers;
 using FluentValidation;
-namespace Ecommerce_API.Validators
+namespace Ecommerce_API.Validators.CommonValidators
 {
     public class PaginationValidator : AbstractValidator<Pagination>
     {

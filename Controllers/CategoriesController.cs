@@ -44,9 +44,10 @@ namespace Ecommerce_API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, CategoryUpdateDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] CategoryUpdateDto dto)
         {
-             await _service.UpdateAsync(id, dto);
+
+            await _service.UpdateAsync(id, dto);
 
             return NoContent();
         }

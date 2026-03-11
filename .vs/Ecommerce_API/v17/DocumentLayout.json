@@ -3,40 +3,60 @@
   "WorkspaceRootPath": "D:\\Work\\Project\\Ecommerce_API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\services\\implementations\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:services\\implementations\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\services\\interfaces\\icategoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:services\\interfaces\\icategoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\services\\implementations\\categoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:services\\implementations\\categoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\services\\interfaces\\iproductservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:services\\interfaces\\iproductservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\categoryvalidators\\categoryupdatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\categoryvalidators\\categoryupdatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\dtos\\productdtos\\productupdatedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:dtos\\productdtos\\productupdatedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\commonvalidators\\paginationvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\commonvalidators\\paginationvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\categoryvalidators\\categorycreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\categoryvalidators\\categorycreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\middleware\\globalexceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:middleware\\globalexceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\services\\implementations\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:services\\implementations\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\productvalidators\\productupdatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\productvalidators\\productupdatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\productvalidators\\productcreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\productvalidators\\productcreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\dtos\\productdtos\\productresponsedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:dtos\\productdtos\\productresponsedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\dtos\\productdtos\\productupdatedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:dtos\\productdtos\\productupdatedto.cs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\dtos\\productdtos\\productcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:dtos\\productdtos\\productcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\validators\\productcreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:validators\\productcreatevalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\data\\configurations\\productconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:data\\configurations\\productconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|d:\\work\\project\\ecommerce_api\\models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C1649668-59D5-4286-9AD9-EEF92EC10524}|Ecommerce_API.csproj|solutionrelative:models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,8 +66,178 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 14,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ProductService.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\ProductService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\ProductService.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\ProductService.cs",
+              "RelativeToolTip": "Services\\Implementations\\ProductService.cs",
+              "ViewState": "AQIAADcAAAAAAAAAAAAqwFgAAABRAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T07:43:03.195Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CategoryUpdateValidator.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CategoryValidators\\CategoryUpdateValidator.cs",
+              "RelativeDocumentMoniker": "Validators\\CategoryValidators\\CategoryUpdateValidator.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CategoryValidators\\CategoryUpdateValidator.cs",
+              "RelativeToolTip": "Validators\\CategoryValidators\\CategoryUpdateValidator.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T16:41:19.74Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PaginationValidator.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CommonValidators\\PaginationValidator.cs",
+              "RelativeDocumentMoniker": "Validators\\CommonValidators\\PaginationValidator.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CommonValidators\\PaginationValidator.cs",
+              "RelativeToolTip": "Validators\\CommonValidators\\PaginationValidator.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T16:41:12.28Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GlobalExceptionMiddleware.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Middleware\\GlobalExceptionMiddleware.cs",
+              "RelativeDocumentMoniker": "Middleware\\GlobalExceptionMiddleware.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Middleware\\GlobalExceptionMiddleware.cs",
+              "RelativeToolTip": "Middleware\\GlobalExceptionMiddleware.cs",
+              "ViewState": "AQIAADEAAAAAAAAAAAAkwFUAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T16:16:38.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ProductCreateDto.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductCreateDto.cs",
+              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductCreateDto.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductCreateDto.cs",
+              "RelativeToolTip": "DTOs\\ProductDtos\\ProductCreateDto.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:56:59.455Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "BaseEntity.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Models\\BaseEntity.cs",
+              "RelativeDocumentMoniker": "Models\\BaseEntity.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Models\\BaseEntity.cs",
+              "RelativeToolTip": "Models\\BaseEntity.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:57:07.248Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Product.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Models\\Product.cs",
+              "RelativeDocumentMoniker": "Models\\Product.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Models\\Product.cs",
+              "RelativeToolTip": "Models\\Product.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:57:05.567Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ProductUpdateDto.cs.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
+              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
+              "RelativeToolTip": "DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:57:01.044Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ProductResponseDto.cs.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
+              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
+              "RelativeToolTip": "DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAA+AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:56:16.008Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CategoryCreateValidator.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CategoryValidators\\CategoryCreateValidator.cs",
+              "RelativeDocumentMoniker": "Validators\\CategoryValidators\\CategoryCreateValidator.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\CategoryValidators\\CategoryCreateValidator.cs",
+              "RelativeToolTip": "Validators\\CategoryValidators\\CategoryCreateValidator.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAA3AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:44:39.879Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACIAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:42:37.419Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ProductCreateValidator.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductValidators\\ProductCreateValidator.cs",
+              "RelativeDocumentMoniker": "Validators\\ProductValidators\\ProductCreateValidator.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductValidators\\ProductCreateValidator.cs",
+              "RelativeToolTip": "Validators\\ProductValidators\\ProductCreateValidator.cs",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAawCUAAABGAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:34:49.608Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ProductUpdateValidator.cs",
+              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductValidators\\ProductUpdateValidator.cs",
+              "RelativeDocumentMoniker": "Validators\\ProductValidators\\ProductUpdateValidator.cs",
+              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductValidators\\ProductUpdateValidator.cs",
+              "RelativeToolTip": "Validators\\ProductValidators\\ProductUpdateValidator.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAAADMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T15:33:57.223Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
@@ -55,118 +245,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ProductService.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\ProductService.cs",
-              "RelativeDocumentMoniker": "Services\\Implementations\\ProductService.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\ProductService.cs",
-              "RelativeToolTip": "Services\\Implementations\\ProductService.cs",
-              "ViewState": "AQIAAHMAAAAAAAAAAAAAAIIAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:43:03.195Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "CategoryService.cs",
               "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\CategoryService.cs",
               "RelativeDocumentMoniker": "Services\\Implementations\\CategoryService.cs",
               "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Services\\Implementations\\CategoryService.cs",
               "RelativeToolTip": "Services\\Implementations\\CategoryService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAAAAAA",
+              "ViewState": "AQIAACkAAAAAAAAAAAAAAEMAAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-10T07:34:46.459Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IProductService.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Services\\Interfaces\\IProductService.cs",
-              "RelativeDocumentMoniker": "Services\\Interfaces\\IProductService.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Services\\Interfaces\\IProductService.cs",
-              "RelativeToolTip": "Services\\Interfaces\\IProductService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAhAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:34:14.49Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ICategoryService.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Services\\Interfaces\\ICategoryService.cs",
-              "RelativeDocumentMoniker": "Services\\Interfaces\\ICategoryService.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Services\\Interfaces\\ICategoryService.cs",
-              "RelativeToolTip": "Services\\Interfaces\\ICategoryService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAhAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:33:30.087Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ProductUpdateDto.cs.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
-              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
-              "RelativeToolTip": "DTOs\\ProductDtos\\ProductUpdateDto.cs.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAqAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:32:58.046Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ProductResponseDto.cs.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
-              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
-              "RelativeToolTip": "DTOs\\ProductDtos\\ProductResponseDto.cs.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAmAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:32:46.779Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ProductCreateValidator.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductCreateValidator.cs",
-              "RelativeDocumentMoniker": "Validators\\ProductCreateValidator.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Validators\\ProductCreateValidator.cs",
-              "RelativeToolTip": "Validators\\ProductCreateValidator.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAABDAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:26:52.104Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ProductConfiguration.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\Data\\Configurations\\ProductConfiguration.cs",
-              "RelativeDocumentMoniker": "Data\\Configurations\\ProductConfiguration.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\Data\\Configurations\\ProductConfiguration.cs",
-              "RelativeToolTip": "Data\\Configurations\\ProductConfiguration.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAAAQAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:25:54.914Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ProductCreateDto.cs",
-              "DocumentMoniker": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductCreateDto.cs",
-              "RelativeDocumentMoniker": "DTOs\\ProductDtos\\ProductCreateDto.cs",
-              "ToolTip": "D:\\Work\\Project\\Ecommerce_API\\DTOs\\ProductDtos\\ProductCreateDto.cs",
-              "RelativeToolTip": "DTOs\\ProductDtos\\ProductCreateDto.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAmAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T07:25:37.981Z",
               "EditorCaption": ""
             }
           ]

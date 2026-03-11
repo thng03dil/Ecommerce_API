@@ -2,9 +2,8 @@ using Ecommerce_API.Data;
 using Ecommerce_API.Middleware;
 using Ecommerce_API.Services.Implementations;
 using Ecommerce_API.Services.Interfaces;
-using Ecommerce_API.Validators;
 using FluentValidation;
-using FluentValidation.AspNetCore;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,12 +21,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// register validation
-builder.Services.AddFluentValidationAutoValidation();// auto check validation when api is called
-builder.Services.AddValidatorsFromAssemblyContaining<CategoryCreateValidator>();// find class implement AbstractValidator
+// register validator
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
-
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 

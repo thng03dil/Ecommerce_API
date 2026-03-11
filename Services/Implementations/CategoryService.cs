@@ -3,6 +3,7 @@ using Ecommerce_API.DTOs.CategoryDtos;
 using Ecommerce_API.Helpers;
 using Ecommerce_API.Models;
 using Ecommerce_API.Services.Interfaces;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_API.Services.Implementations
@@ -10,10 +11,17 @@ namespace Ecommerce_API.Services.Implementations
     public class CategoryService : ICategoryService
     {
         private readonly AppDbContext _context;
+        private readonly IValidator<CategoryCreateDto> _createValidator;
+        private readonly IValidator<CategoryUpdateDto> _updateValidator;
 
-        public CategoryService(AppDbContext context)
+        public CategoryService(
+            AppDbContext context,
+            IValidator<CategoryCreateDto> createValidator,
+            IValidator<CategoryUpdateDto> updateValidator)
         {
             _context = context;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         public async Task<IEnumerable<CategoryResponseDto>> GetAllAsync(Pagination pagination)
@@ -48,18 +56,16 @@ namespace Ecommerce_API.Services.Implementations
             if (category == null)
                 throw new Exception("Category not found");
 
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                Slug = category.Slug,
-                ProductCount = category.Products?.Count ?? 0
-            };
+            return MapToResponseDto(category);
         }
 
         public async Task<CategoryResponseDto> CreateAsync(CategoryCreateDto dto)
         {
+            var validationResult = await _createValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
             var category = new Category
             {
                 Name = dto.Name,
@@ -71,18 +77,19 @@ namespace Ecommerce_API.Services.Implementations
 
             await _context.SaveChangesAsync();
 
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                Slug = category.Slug,
-                ProductCount = 0
-            };
+            return MapToResponseDto(category);
         }
 
         public async Task UpdateAsync(int id, CategoryUpdateDto dto)
         {
+            dto.Id = id;
+
+            var validationResult = await _updateValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var category = await _context.Categories
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
             if (category == null)
@@ -99,16 +106,22 @@ namespace Ecommerce_API.Services.Implementations
         public async Task DeleteAsync(int id)
         {
             var category = await _context.Categories
-                .AsNoTracking()
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
+        .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
 
             if (category == null)
-                throw new Exception("Category not found");
+                throw new KeyNotFoundException("Category not found");
 
             category.IsDeleted = true;
 
             await _context.SaveChangesAsync();
         }
+        private static CategoryResponseDto MapToResponseDto(Category c) => new()
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Slug = c.Slug,
+            ProductCount = c.Products?.Count() ?? 0
+        };
     }
 }

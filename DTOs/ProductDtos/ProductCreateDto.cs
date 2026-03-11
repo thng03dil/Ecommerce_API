@@ -10,5 +10,6 @@ namespace Ecommerce_API.DTOs.ProductDtos
         public string? Description { get; set; }
 
         public int Stock { get; set; }
+
     }
 }
