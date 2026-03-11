@@ -16,6 +16,9 @@ namespace Ecommerce_API.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(150);
 
+            builder.Property(x => x.CategoryId)
+                .IsRequired();
+
             builder.Property(x => x.Description)
                 .HasMaxLength(1000);
 

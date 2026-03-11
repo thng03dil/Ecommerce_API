@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Ecommerce_API.Exceptions;
+using Ecommerce_API.Helpers.Responses;
 namespace Ecommerce_API.Middleware
 {
     public class GlobalExceptionMiddleware

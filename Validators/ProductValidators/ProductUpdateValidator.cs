@@ -31,21 +31,19 @@ namespace Ecommerce_API.Validators.ProductValidators
                 .GreaterThanOrEqualTo(0).WithMessage("{PropertyName} must be greater than 0 or equal to 0.");
 
             RuleFor(x => x.CategoryId)
-               .NotEmpty().WithMessage("{PropertyName} cannot be empty")
-               .GreaterThan(0)
-               .MustAsync(async (categoryId, token) =>
-               {
-                   if (categoryId.HasValue)
-                   {
-                       return await CategoryExists(categoryId.Value, token);
-                   }
-                   return false;
-               })
-               .WithMessage("The selected Category does not exist.");
+                .NotEmpty().WithMessage("{PropertyName} cannot be empty")
+                .GreaterThan(0).WithMessage("{PropertyName} must be a valid ID")
+                .MustAsync(CategoryExists) 
+                .WithMessage("The selected Category does not exist.");
+
+            RuleFor(x => x.Description)
+               .MaximumLength(1000).WithMessage("{PropertyName} must not exceed 1000 characters");
         }
-        private async Task<bool> CategoryExists(int categoryId, CancellationToken token)
-        {
-            return await _context.Categories.AnyAsync(c => c.Id == categoryId && !c.IsDeleted, token);
-        }
+    private async Task<bool> CategoryExists(int categoryId, CancellationToken token)
+    {
+        // Vì categoryId là int nên nó luôn có giá trị, không cần check .HasValue nữa
+        return await _context.Categories
+            .AnyAsync(c => c.Id == categoryId && !c.IsDeleted, token);
     }
+}
 }

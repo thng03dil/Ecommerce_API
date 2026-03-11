@@ -2,6 +2,7 @@
 using Ecommerce_API.Services.Interfaces;
 using Ecommerce_API.DTOs.CategoryDtos;
 using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.DTOs.Filters;
 
 
 namespace Ecommerce_API.Controllers
@@ -18,9 +19,9 @@ namespace Ecommerce_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PaginationDto pagination)
+        public async Task<IActionResult> GetAll([FromQuery] CategoryFilterDto filter , [FromQuery] PaginationDto pagination)
         {
-            var result = await _service.GetAllAsync(pagination);
+            var result = await _service.GetAllAsync(filter, pagination);
             return Ok(result);
         }
 

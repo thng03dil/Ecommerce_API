@@ -6,59 +6,42 @@ using Ecommerce_API.Services.Interfaces;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce_API.Helpers.Pagination;
-using Ecommerce_API.Extensions;
 using Ecommerce_API.Exceptions;
 using Ecommerce_API.Helpers.Responses;
+using Ecommerce_API.Repositories.Interfaces;
+using Ecommerce_API.Helpers.Extensions;
+using Ecommerce_API.DTOs.Filters;
 
 namespace Ecommerce_API.Services.Implementations
 {
     public class CategoryService : ICategoryService
     {
-        private readonly AppDbContext _context;
         private readonly IValidator<CategoryCreateDto> _createValidator;
         private readonly IValidator<CategoryUpdateDto> _updateValidator;
+        private readonly ICategoryRepo _categoryRepo;
 
         public CategoryService(
-            AppDbContext context,
+            ICategoryRepo categoryRepo,
             IValidator<CategoryCreateDto> createValidator,
             IValidator<CategoryUpdateDto> updateValidator)
         {
-            _context = context;
+            _categoryRepo = categoryRepo;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
         }
 
-        public async Task<PagedResponse<CategoryResponseDto>> GetAllAsync(PaginationDto pagedto)
+        public async Task<PagedResponse<CategoryResponseDto>> GetAllAsync(CategoryFilterDto filter, PaginationDto pagedto)
         {
-            var query = _context.Categories
-                .AsNoTracking()
-                .Where(x => !x.IsDeleted);
+            //  var (items, totalItems) = await _categoryRepo.GetAllAsync( pagedto);
+            var (items,totalItems) = await _categoryRepo.GetFilteredAsync(filter, pagedto);
+            var data = items.Select(c=>MapToResponseDto(c)).ToList();
 
-            var totalItems = await query.CountAsync();
-            var items = await query
-                .OrderBy(c => c.Id)
-                .Skip((pagedto.PageNumber - 1) * pagedto.PageSize)
-                .Take(pagedto.PageSize)
-                .Select(c => new CategoryResponseDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Slug = c.Slug,
-                    ProductCount = c.Products.Count(),
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
-                })
-                .ToListAsync();
-            return new PagedResponse<CategoryResponseDto>(items, pagedto.PageNumber, pagedto.PageSize, totalItems);
+            return new PagedResponse<CategoryResponseDto>(data, pagedto.PageNumber, pagedto.PageSize, totalItems);
         }
 
         public async Task<ApiResponse<CategoryResponseDto?>> GetByIdAsync(int id)
         {
-            var category = await _context.Categories
-                .AsNoTracking()
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            var category = await _categoryRepo.GetByIdAsync(id);
 
             if (category == null)
                 throw new NotFoundException("Category not found");
@@ -83,10 +66,7 @@ namespace Ecommerce_API.Services.Implementations
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null
             };
-
-            _context.Categories.Add(category);
-
-            await _context.SaveChangesAsync();
+            await _categoryRepo.CreateAsync(category);
 
             var item = MapToResponseDto(category);
             return new ApiResponse<CategoryResponseDto>(
@@ -103,12 +83,11 @@ namespace Ecommerce_API.Services.Implementations
             var validationResult = await _updateValidator.ValidateAsync(dto);
             validationResult.ThrowIfInvalid();
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            var category = await _categoryRepo.GetByIdForUpdateAsync(dto.Id);
             if (category == null)
                 throw new NotFoundException("Category not found");
-            var slugExists = await _context.Categories
-            .AnyAsync(x => x.Slug == dto.Slug && x.Id != id);
+
+            var slugExists = await _categoryRepo.SlugExistsAsync(dto.Slug,dto.Id);
 
             if (slugExists)
                 throw new Ecommerce_API.Exceptions.ValidationException("slug", "Slug already exists");
@@ -118,7 +97,6 @@ namespace Ecommerce_API.Services.Implementations
             category.Slug = dto.Slug;
             category.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
             var item = MapToResponseDto(category);
             return new ApiResponse<CategoryResponseDto>(
                    true,
@@ -129,15 +107,14 @@ namespace Ecommerce_API.Services.Implementations
 
         public async Task<ApiResponse<CategoryResponseDto>> DeleteAsync(int id)
         {
-            var category = await _context.Categories
-        .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
+            var category = await _categoryRepo.GetByIdForUpdateAsync(id);
 
             if (category == null)
                 throw new NotFoundException("Category not found");
 
             category.IsDeleted = true;
 
-            await _context.SaveChangesAsync();
+            await _categoryRepo.SaveChangesAsync();
 
             var item = MapToResponseDto(category);
             return new ApiResponse<CategoryResponseDto>(

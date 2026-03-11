@@ -1,12 +1,13 @@
 ﻿using Ecommerce_API.DTOs.CategoryDtos;
 using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.DTOs.Filters;
 using Ecommerce_API.Helpers.Pagination;
 using Ecommerce_API.Helpers.Responses;
 namespace Ecommerce_API.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<PagedResponse<CategoryResponseDto>> GetAllAsync(PaginationDto pagedto);
+        Task<PagedResponse<CategoryResponseDto>> GetAllAsync(CategoryFilterDto filter, PaginationDto pagedto);
         Task<ApiResponse<CategoryResponseDto?>> GetByIdAsync(int id);
         Task<ApiResponse<CategoryResponseDto>> CreateAsync(CategoryCreateDto dto);
         Task<ApiResponse<CategoryResponseDto>> UpdateAsync(int id, CategoryUpdateDto dto);

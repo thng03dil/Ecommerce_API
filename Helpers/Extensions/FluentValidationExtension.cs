@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 using Ecommerce_API.Exceptions;
 
-namespace Ecommerce_API.Extensions
+namespace Ecommerce_API.Helpers.Extensions
 {
     public static class FluentValidationExtensions
     {

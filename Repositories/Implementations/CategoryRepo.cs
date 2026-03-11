@@ -1,0 +1,101 @@
+﻿using Ecommerce_API.Data;
+using Ecommerce_API.DTOs.CategoryDtos;
+using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.DTOs.Filters;
+using Ecommerce_API.Helpers.Extensions;
+using Ecommerce_API.Models;
+using Ecommerce_API.Repositories.Interfaces;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+namespace Ecommerce_API.Repositories.Implementations
+{
+    public class CategoryRepo : ICategoryRepo
+    {
+
+        private readonly AppDbContext _context;
+        public CategoryRepo(AppDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<(IEnumerable<Category>, int totalCount)> GetAllAsync (PaginationDto pagedto) {
+            var query = _context.Categories
+                    .AsNoTracking()
+                    .Include(c => c.Products)
+                    .Where(x => !x.IsDeleted);
+
+            var totalItem = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(c => c.Id)
+                .Skip((pagedto.PageNumber - 1) * pagedto.PageSize)
+                .Take(pagedto.PageSize)
+                .ToListAsync();
+            return (items,totalItem);
+        }
+
+        public async Task<Category?> GetByIdAsync(int id) {
+            return await _context.Categories
+                    .AsNoTracking()
+                    .Include(c => c.Products)
+                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+        }
+        
+        public async Task CreateAsync(Category category) {
+            
+               await _context.Categories.AddAsync(category);
+             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Category?> GetByIdForUpdateAsync(int id)
+        {
+            return await _context.Categories
+                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+        }
+        public async Task<bool> SlugExistsAsync(string slug, int excludeId)
+        {
+            return await _context.Categories
+                .AnyAsync(x => x.Slug == slug && x.Id != excludeId);
+        }
+        public async Task UpdateAsync(Category category) {
+
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveChangesAsync() {
+            await _context.SaveChangesAsync();
+        }
+        //filter
+        public async Task<(IEnumerable<Category>, int)> GetFilteredAsync(
+            CategoryFilterDto filter, PaginationDto pagination)
+        {
+            var query = _context.Categories
+                    .AsNoTracking()
+                    .Include(c => c.Products)
+                    .Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(filter.Keyword))
+            {
+                query = query.Where(c => c.Name.Contains(filter.Keyword));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Slug))
+            {
+                query = query.Where(c => c.Slug.Contains(filter.Slug));
+            }
+            Console.WriteLine($"SortBy: {filter.SortBy}, SortOrder: {filter.SortOrder}");
+            query = query.ApplySorting(
+                filter.SortBy ?? "Id",
+                filter.SortOrder ?? "asc");
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return (items, total);
+        }
+    }
+}

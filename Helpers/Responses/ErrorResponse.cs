@@ -1,6 +1,6 @@
 ﻿using Ecommerce_API.Exceptions;
 
-namespace Ecommerce_API.Middleware
+namespace Ecommerce_API.Helpers.Responses
 {
     public class ErrorResponse
     {
