@@ -1,17 +1,25 @@
-﻿namespace Ecommerce_API.Helpers.Responses
+﻿using Ecommerce_API.Pagination;
+
+namespace Ecommerce_API.Helpers.Responses
 {
     public class ApiResponse<T>
     {
+        public int StatusCode { get; set; }
         public bool Success { get; set; } = false;
 
         public string Message { get; set; } 
 
-        public T Data { get; set; }
-        public ApiResponse(bool success, string message,T items )
+        public T? Data { get; set; }
+        public ApiResponse(int statusCode , bool success, string message, T data )
         {
+            StatusCode = statusCode;
             Success = success;
             Message = message;
-            Data = items;
+            Data = data;
            }
+        public static ApiResponse<T> SuccessResponse(T data, string message = "Success")
+        {
+            return new ApiResponse<T>(200, true, message, data);
+        }
     }
 }

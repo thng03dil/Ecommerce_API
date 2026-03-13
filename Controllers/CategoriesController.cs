@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce_API.Services.Interfaces;
 using Ecommerce_API.DTOs.CategoryDtos;
-using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.Pagination;
 using Ecommerce_API.DTOs.Filters;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Ecommerce_API.Controllers
@@ -35,7 +36,7 @@ namespace Ecommerce_API.Controllers
 
             return Ok(result);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]                                                                                              
         public async Task<IActionResult> Create(CategoryCreateDto dto)
         {
@@ -43,7 +44,7 @@ namespace Ecommerce_API.Controllers
             var result = await _service.CreateAsync(dto);
             return Ok(result);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryUpdateDto dto)
         {
@@ -52,7 +53,7 @@ namespace Ecommerce_API.Controllers
 
             return Ok(result);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

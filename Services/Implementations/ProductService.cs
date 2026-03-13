@@ -1,17 +1,12 @@
 ﻿using Ecommerce_API.Data;
 using Ecommerce_API.DTOs.ProductDtos;
-using Ecommerce_API.DTOs.Common;
-using Ecommerce_API.Helpers.Pagination;
 using Ecommerce_API.Models;
 using Ecommerce_API.Services.Interfaces;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Ecommerce_API.Exceptions;
-using Ecommerce_API.DTOs.CategoryDtos;
 using Ecommerce_API.Helpers.Responses;
 using Ecommerce_API.Repositories.Interfaces;
-using Ecommerce_API.Helpers.Extensions;
 using Ecommerce_API.DTOs.Filters;
+using Ecommerce_API.Pagination;
 
 namespace Ecommerce_API.Services.Implementations
 {
@@ -19,25 +14,20 @@ namespace Ecommerce_API.Services.Implementations
     {
 
         private readonly IProductRepo _productRepo;
-        private readonly IValidator<ProductCreateDto> _createValidator;
-        private readonly IValidator<ProductUpdateDto> _updateValidator;
         public ProductService(
-            IProductRepo productRepo,
-            IValidator<ProductCreateDto> createValidator,
-            IValidator<ProductUpdateDto> updateValidator)
+            IProductRepo productRepo)
         {
             _productRepo = productRepo;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
         }
 
-        public async Task<PagedResponse<ProductResponseDto>> GetAllAsync(ProductFilterDto filter, PaginationDto pagedto)
+        public async Task<ApiResponse<PagedResponse<ProductResponseDto>>> GetAllAsync(ProductFilterDto filter, PaginationDto pagination)
         {
-            //  var (products, totalItems) = await _productRepo.GetAllAsync( pagedto);
-            var (products, totalItems) = await _productRepo.GetFilteredAsync(filter, pagedto);
+            //  var (products, totalItems) = await _productRepo.GetAllAsync( pagination);
+            var (products, totalItems) = await _productRepo.GetFilteredAsync(filter, pagination);
 
             var data = products.Select(c => MapToResponseDto(c)).ToList();
-            return new PagedResponse<ProductResponseDto>(data, pagedto.PageNumber, pagedto.PageSize, totalItems);
+            var pagedData = new PagedResponse<ProductResponseDto>(data, pagination.PageNumber, pagination.PageSize, totalItems);
+            return ApiResponse<PagedResponse<ProductResponseDto>>.SuccessResponse(pagedData, "Get data successfully");
         }
 
         public async Task<ApiResponse<ProductResponseDto?>> GetByIdAsync(int id)
@@ -48,17 +38,15 @@ namespace Ecommerce_API.Services.Implementations
                 throw new NotFoundException("Product not found");
 
             var item = MapToResponseDto(product);
-            return new ApiResponse<ProductResponseDto?>(
-                    true,
-                    "Get data successfully",
-                    item
-                    );
+            return ApiResponse<ProductResponseDto?>.SuccessResponse(
+                    item,
+                    "Get data successfully"
+                );
         }
 
         public async Task<ApiResponse<ProductResponseDto>> CreateAsync(ProductCreateDto dto)
         {
-            var validationResult = await _createValidator.ValidateAsync(dto);
-            validationResult.ThrowIfInvalid();
+            
             // Validate Category exist
              var categoryExist = await _productRepo.CategoryExistsAsync(dto.CategoryId);
 
@@ -80,21 +68,15 @@ namespace Ecommerce_API.Services.Implementations
             await _productRepo.LoadCategoryAsync(product);
 
             var item = MapToResponseDto(product);
-            return new ApiResponse<ProductResponseDto>(
-                    true,
-                    "Create data successfully",
-                    item
+            return ApiResponse<ProductResponseDto>.SuccessResponse(
+                     item,
+                     "Create data successfully"
                     );
         }
 
         public async Task<ApiResponse<ProductResponseDto>> UpdateAsync(int id, ProductUpdateDto dto)
         {
-            dto.Id = id;
-
-            var result = await _updateValidator.ValidateAsync(dto);
-            result.ThrowIfInvalid();
-
-            var product = await _productRepo.GetByIdAsync(dto.Id);
+            var product = await _productRepo.GetByIdAsync(id);
             if (product == null)
                 throw new NotFoundException("Product not found");
 
@@ -118,11 +100,10 @@ namespace Ecommerce_API.Services.Implementations
             await _productRepo.SaveChangesAsync();
 
             var item = MapToResponseDto(product);
-            return new ApiResponse<ProductResponseDto>(
-                    true,
-                    "Get data successfully",
-                    item
-                    );
+            return ApiResponse<ProductResponseDto>.SuccessResponse(
+                      item,
+                      "Update data successfully"
+                     );
         }
 
         public async Task<ApiResponse<ProductResponseDto>> DeleteAsync(int id)
@@ -137,10 +118,9 @@ namespace Ecommerce_API.Services.Implementations
 
             var item = MapToResponseDto(product);
 
-            return new ApiResponse<ProductResponseDto>(
-                   true,
-                   "Delete data successfully",
-                   item
+            return  ApiResponse<ProductResponseDto>.SuccessResponse(
+                    item,
+                   "Delete data successfully"
                    );
         }
         private static ProductResponseDto MapToResponseDto(Product p) => new()

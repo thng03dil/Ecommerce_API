@@ -1,6 +1,7 @@
-﻿using Ecommerce_API.DTOs.Common;
+﻿
 using Ecommerce_API.DTOs.Filters;
 using Ecommerce_API.Models;
+using Ecommerce_API.Pagination;
 
 namespace Ecommerce_API.Repositories.Interfaces
 {

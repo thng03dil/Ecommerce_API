@@ -1,5 +1,5 @@
 ﻿using Ecommerce_API.Data;
-using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.Pagination;
 using Ecommerce_API.DTOs.Filters;
 using Ecommerce_API.Helpers.Extensions;
 using Ecommerce_API.Models;

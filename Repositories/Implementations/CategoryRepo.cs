@@ -1,6 +1,6 @@
 ﻿using Ecommerce_API.Data;
 using Ecommerce_API.DTOs.CategoryDtos;
-using Ecommerce_API.DTOs.Common;
+using Ecommerce_API.Pagination;
 using Ecommerce_API.DTOs.Filters;
 using Ecommerce_API.Helpers.Extensions;
 using Ecommerce_API.Models;
@@ -67,32 +67,21 @@ namespace Ecommerce_API.Repositories.Implementations
         }
         //filter
         public async Task<(IEnumerable<Category>, int)> GetFilteredAsync(
-            CategoryFilterDto filter, PaginationDto pagination)
+     CategoryFilterDto filter,
+     PaginationDto pagination)
         {
             var query = _context.Categories
-                    .AsNoTracking()
-                    .Include(c => c.Products)
-                    .Where(x => !x.IsDeleted);
-
-            if (!string.IsNullOrWhiteSpace(filter.Keyword))
-            {
-                query = query.Where(c => c.Name.Contains(filter.Keyword));
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.Slug))
-            {
-                query = query.Where(c => c.Slug.Contains(filter.Slug));
-            }
-            Console.WriteLine($"SortBy: {filter.SortBy}, SortOrder: {filter.SortOrder}");
-            query = query.ApplySorting(
-                filter.SortBy ?? "Id",
-                filter.SortOrder ?? "asc");
+                .AsNoTracking()
+                .Include(c => c.Products)
+                .Where(x => !x.IsDeleted)
+                .ApplySearch(filter.Keyword, c => c.Name)
+                .ApplySearch(filter.Slug, c => c.Slug)
+                .ApplySorting(filter.SortBy ?? "Id", filter.SortOrder ?? "asc");
 
             var total = await query.CountAsync();
 
             var items = await query
-                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
-                .Take(pagination.PageSize)
+                .ApplyPagination(pagination.PageNumber, pagination.PageSize)
                 .ToListAsync();
 
             return (items, total);

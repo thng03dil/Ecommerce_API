@@ -28,39 +28,36 @@ namespace Ecommerce_API.Middleware
                 await HandleExceptionAsync(context, ex);
             }
         }
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/json";
+            var statusCode = StatusCodes.Status500InternalServerError;
+            var errorCode = "INTERNAL_SERVER_ERROR";
+
+            if (exception is BaseException baseEx)
+            {
+                statusCode = baseEx.StatusCode;
+                errorCode = baseEx.ErrorCode;
+            }
+
+            _logger.LogError(exception, exception.Message);
 
             var response = new ErrorResponse
             {
+                StatusCode = statusCode,
                 Success = false,
+                ErrorCode = errorCode,
+                Message = exception.Message,
                 Path = context.Request.Path,
                 TraceId = context.TraceIdentifier,
                 Timestamp = DateTime.UtcNow
             };
-            //custom errors
-            if (exception is BaseException baseEx)
-            {
-                context.Response.StatusCode = baseEx.StatusCode;
-                response.StatusCode = baseEx.StatusCode;
-                response.ErrorCode = baseEx.ErrorCode;
-                response.Message = baseEx.Message;
-                // auto set List<ValidationError> from ValidationException
-                response.Errors = baseEx.Errors;
 
-            }
-            // server errors (NullReference, SQL Error...)
-            else
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.StatusCode = 500;
-                response.ErrorCode = "INTERNAL_SERVER_ERROR";
-                response.Message = "An unexpected error occurred on the server.";
-            }
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
 
-            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+            await context.Response.WriteAsync(
+                JsonSerializer.Serialize(response)
+            );
         }
     }
 }

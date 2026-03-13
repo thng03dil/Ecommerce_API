@@ -4,16 +4,15 @@ namespace Ecommerce_API.Exceptions
 {
     public abstract class BaseException : Exception
     {
-        public string ErrorCode { get; set; }
-        public int StatusCode { get; set; }
+        public int StatusCode { get; }
 
-        public List<ValidationError>? Errors { get; set; }
+        public string ErrorCode { get; }
 
-        protected BaseException(int statusCode, string errorCode, string message, List<ValidationError>? errors = null) : base(message)
+        protected BaseException(int statusCode, string message, string errorCode)
+            : base(message)
         {
             StatusCode = statusCode;
             ErrorCode = errorCode;
-            Errors = errors;
         }
     }
 }

@@ -145,3 +145,5 @@ D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\refint\Ecommerce_API.dll
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\Ecommerce_API.pdb
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\Ecommerce_API.genruntimeconfig.cache
 D:\Work\Project\Ecommerce_API\obj\Debug\net8.0\ref\Ecommerce_API.dll
+D:\Work\Project\Ecommerce_API\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\Work\Project\Ecommerce_API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

@@ -2,8 +2,9 @@
 
 using Ecommerce_API.Services.Interfaces;
 using Ecommerce_API.DTOs.ProductDtos;
-using Ecommerce_API.DTOs.Common;
 using Ecommerce_API.DTOs.Filters;
+using Ecommerce_API.Pagination;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce_API.Controllers
 {
@@ -35,6 +36,7 @@ namespace Ecommerce_API.Controllers
             return Ok(product);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(ProductCreateDto dto)
         {
@@ -42,6 +44,7 @@ namespace Ecommerce_API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, ProductUpdateDto dto)
         {
@@ -49,7 +52,7 @@ namespace Ecommerce_API.Controllers
 
             return Ok(result); 
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
