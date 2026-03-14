@@ -1,23 +1,33 @@
-using Ecommerce.Application.Interfaces;
+
+using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Application.Services;
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using System.Reflection;
+using Ecommerce.Infrastructure.Repositories;
+using Ecommerce.Application.Interfaces.IRepositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register Controller
-builder.Services.AddControllers();
 
 // Register DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Interface for DbContext
-builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
+//Register Repository
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 // Register Service
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+// Register Controller
+builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

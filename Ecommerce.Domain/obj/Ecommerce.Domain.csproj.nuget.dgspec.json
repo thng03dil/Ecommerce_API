@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {}
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {}
   },
   "projects": {
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
+        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
         "projectName": "Ecommerce.Domain",
-        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
+        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
         "packagesPath": "C:\\Users\\THAO\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\obj\\",
+        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

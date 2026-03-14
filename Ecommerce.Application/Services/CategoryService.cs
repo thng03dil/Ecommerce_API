@@ -3,103 +3,118 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.DTOs.Category;
 using Ecommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.Application.Interfaces.Services;
+using Ecommerce.Application.Pagination;
+using Ecommerce.Application.DTOs.Filters;
+using Ecommerce.Application.Interfaces.IRepositories;
+using Ecommerce.Application.Interfaces.Repositories;
 
 namespace Ecommerce.Application.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly IAppDbContext _context;
+        private readonly ICategoryRepository _categoryRepo;
 
-        public CategoryService(IAppDbContext context)
+        public CategoryService(ICategoryRepository categoryRepo)
         {
-            _context = context;
-        }
-        public async Task<IEnumerable<CategoryResponseDto>> GetAllAsync()
-        {
-            return await _context.Categories
-                .Select(c => new CategoryResponseDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Slug = c.slug,
-                    ProductCount = c.Products.Count()
-                })
-                .ToListAsync();
+            _categoryRepo = categoryRepo;
         }
 
-        public async Task<CategoryResponseDto?> GetByIdAsync(int id)
+        public async Task<ApiResponse<PagedResponse<CategoryResponseDto>>> GetAllAsync(CategoryFilterDto filter, PaginationDto pagination)
         {
-            var category = await _context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            //  var (items, totalItems) = await _categoryRepo.GetAllAsync( pagination);
+            var (items, totalItems) = await _categoryRepo.GetFilteredAsync(filter, pagination);
 
-            if (category == null) return null;
+            var data = items.Select(c => MapToResponseDto(c)).ToList();
 
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                Slug = category.slug,
-                ProductCount = category.Products.Count
-            };
+            var pagedData = new PagedResponse<CategoryResponseDto>(data, pagination.PageNumber, pagination.PageSize, totalItems);
+            return ApiResponse<PagedResponse<CategoryResponseDto>>.SuccessResponse(pagedData, "Get data successfully");
         }
 
-        public async Task<CategoryResponseDto> CreateAsync(CategoryCreateDto dto)
+
+        public async Task<ApiResponse<CategoryResponseDto?>> GetByIdAsync(int id)
         {
+            var category = await _categoryRepo.GetByIdAsync(id);
+
+            if (category == null)
+                throw new NotFoundException("Category not found");
+
+            var item = MapToResponseDto(category);
+            return ApiResponse<CategoryResponseDto?>.SuccessResponse(
+                     item,
+                     "Create data successfully"
+                    );
+        }
+
+        public async Task<ApiResponse<CategoryResponseDto>> CreateAsync(CategoryCreateDto dto)
+        {
+
             var category = new Category
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                slug = dto.Slug
+                Slug = dto.Slug,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = null
             };
+            await _categoryRepo.CreateAsync(category);
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                Slug = category.slug,
-                ProductCount = 0
-            };
+            var item = MapToResponseDto(category);
+            return ApiResponse<CategoryResponseDto>.SuccessResponse(
+                   item,
+                    "Create data successfully"
+                    );
         }
 
-        public async Task<bool> UpdateAsync(int id, CategoryUpdateDto dto)
+        public async Task<ApiResponse<CategoryResponseDto>> UpdateAsync(int id, CategoryUpdateDto dto)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null) return false;
+
+            var category = await _categoryRepo.GetByIdForUpdateAsync(id);
+            if (category == null)
+                throw new NotFoundException("Category not found");
 
             category.Name = dto.Name;
             category.Description = dto.Description;
-            category.slug = dto.Slug;
+            category.Slug = dto.Slug;
+            category.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
-            return true;
+            var item = MapToResponseDto(category);
+            return ApiResponse<CategoryResponseDto>.SuccessResponse(
+                   item,
+                   "Update data successfully"
+                   );
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<ApiResponse<CategoryResponseDto>> DeleteAsync(int id)
         {
-            var category = await _context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _categoryRepo.GetByIdForUpdateAsync(id);
 
-            if (category == null) return false;
+            if (category == null)
+                throw new NotFoundException("Category not found");
 
-            if (category.Products.Any())
-                return false; // Không cho xoá nếu còn product
+            category.IsDeleted = true;
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            await _categoryRepo.SaveChangesAsync();
 
-            return true;
+            var item = MapToResponseDto(category);
+            return ApiResponse<CategoryResponseDto>.SuccessResponse(
+                     item,
+                    "Delete data successfully"
+            );
         }
+        private static CategoryResponseDto MapToResponseDto(Category c) => new()
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Slug = c.Slug,
+            ProductCount = c.Products?.Count() ?? 0,
+            CreatedAt = c.CreatedAt,
+            UpdatedAt = c.UpdatedAt
+        };
     }
 }
+

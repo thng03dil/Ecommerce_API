@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\Ecommerce.API.csproj": {}
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\Ecommerce.API.csproj": {}
   },
   "projects": {
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\Ecommerce.API.csproj": {
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\Ecommerce.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
+        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
         "projectName": "Ecommerce.API",
-        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
+        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
         "packagesPath": "C:\\Users\\THAO\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\obj\\",
+        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,11 +33,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
-                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj"
+              "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
+                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj"
               },
-              "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj": {
-                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj"
+              "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj": {
+                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj"
               }
             }
           }
@@ -57,6 +57,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "FluentValidation.DependencyInjectionExtensions": {
+              "target": "Package",
+              "version": "[12.1.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.2, )"
@@ -103,14 +107,14 @@
         }
       }
     },
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj",
+        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj",
         "projectName": "Ecommerce.Application",
-        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj",
+        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj",
         "packagesPath": "C:\\Users\\THAO\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\obj\\",
+        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -132,8 +136,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
-                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj"
+              "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
+                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj"
               }
             }
           }
@@ -153,6 +157,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[12.1.1, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[8.0.13, )"
@@ -184,14 +192,14 @@
         }
       }
     },
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
+        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
         "projectName": "Ecommerce.Domain",
-        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
+        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj",
         "packagesPath": "C:\\Users\\THAO\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\obj\\",
+        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -249,14 +257,14 @@
         }
       }
     },
-    "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj": {
+    "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj",
         "projectName": "Ecommerce.Infrastructure",
-        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj",
+        "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\Ecommerce.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\THAO\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Infrastructure\\obj\\",
+        "outputPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -278,11 +286,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
-                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj"
+              "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj": {
+                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Application\\Ecommerce.Application.csproj"
               },
-              "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
-                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj"
+              "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj": {
+                "projectPath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.Domain\\Ecommerce.Domain.csproj"
               }
             }
           }

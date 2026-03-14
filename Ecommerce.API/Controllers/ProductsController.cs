@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Domain.Entities;
 using System;
-using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.DTOs.ProductDTOs;
+using Ecommerce.Application.Interfaces.Services;
 
 namespace Ecommerce.API.Controllers;
 

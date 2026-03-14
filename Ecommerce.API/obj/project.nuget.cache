@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "xlZF1fKGHpYxJ18o9MoM+sqLZYbnoXJbVlsrxBN07u9ZHzSnV4Ueah09+9TyMJEE9vG9kiJEnfTVU5JMZOAHZA==",
+  "dgSpecHash": "jn0ybcBsTjpPnxvf67UjnV8vc9ADJK/i2Yufoz/HvCbtccJbXyWt0mJOt3U9KvmXx/3qGMR7DMqU3kSxgWZRyg==",
   "success": true,
-  "projectFilePath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
+  "projectFilePath": "D:\\Work\\Project\\E-commerce_API\\Ecommerce_API\\Ecommerce.API\\Ecommerce.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\THAO\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\THAO\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
+    "C:\\Users\\THAO\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\THAO\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
     "C:\\Users\\THAO\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\THAO\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.2\\microsoft.aspnetcore.openapi.8.0.2.nupkg.sha512",
     "C:\\Users\\THAO\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
