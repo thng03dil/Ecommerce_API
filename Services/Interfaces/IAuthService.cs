@@ -9,6 +9,6 @@ namespace Ecommerce_API.Services.Interfaces
         Task RegisterAsync(RegisterDto request);
 
         Task<AuthResponseDto> LoginAsync(LoginDto request);
-        Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequest request);
+        Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request);
     }
 }

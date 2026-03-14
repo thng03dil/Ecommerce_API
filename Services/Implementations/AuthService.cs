@@ -1,12 +1,14 @@
-﻿using Ecommerce_API.Services.Interfaces;
-using Ecommerce_API.Repositories.Interfaces;
-using Ecommerce_API.Models;
+﻿using Ecommerce_API.Data.Configurations;
 using Ecommerce_API.DTOs.Auth;
-using Ecommerce_API.Helpers;
-using Microsoft.AspNetCore.Identity.Data;
 using Ecommerce_API.DTOs.Common;
-using System.Security.Claims;
 using Ecommerce_API.Exceptions;
+using Ecommerce_API.Helpers;
+using Ecommerce_API.Models;
+using Ecommerce_API.Repositories.Interfaces;
+using Ecommerce_API.Services.Interfaces;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace Ecommerce_API.Services.Implementations
 {
@@ -14,13 +16,16 @@ namespace Ecommerce_API.Services.Implementations
     {
         private readonly IUserRepo _userRepo;
         private readonly IJwtService _jwtService;
+        private readonly JwtSettings _jwtSettings;
 
         public AuthService(
             IUserRepo userRepo,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IOptions<JwtSettings> jwtSettings)
         {
             _userRepo = userRepo;
             _jwtService = jwtService;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task RegisterAsync(RegisterDto request)
@@ -33,7 +38,8 @@ namespace Ecommerce_API.Services.Implementations
             var user = new User
             {
                 Email = request.Email,
-                PasswordHash = PasswordHasher.Hash(request.Password)
+                PasswordHash = PasswordHasher.Hash(request.Password),
+                Role = "User"
             };
 
             await _userRepo.AddAsync(user);
@@ -44,22 +50,18 @@ namespace Ecommerce_API.Services.Implementations
         {
             var user = await _userRepo.GetByEmailAsync(request.Email);
 
-            if (user == null)
+            if (user == null ||
+                !PasswordHasher.Verify(request.Password, user.PasswordHash))
+            {
                 throw new UnauthorizedException("Invalid email or password");
-
-            var valid = PasswordHasher.Verify(
-                request.Password,
-                user.PasswordHash);
-
-            if (!valid)
-                throw new UnauthorizedException("Invalid email or password");
+            }
 
             var accessToken = _jwtService.GenerateAccessToken(user);
-
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            user.RefreshTokenExpiryTime =
+                DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDays);
 
             await _userRepo.UpdateAsync(user);
 
@@ -67,18 +69,16 @@ namespace Ecommerce_API.Services.Implementations
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                ExpiresIn = 900
+                ExpiresIn = _jwtSettings.ExpiryMinutes * 60
             };
         }
-        public async Task<AuthResponseDto> RefreshTokenAsync(
-    RefreshTokenRequest request)
-        {
-            var principal =
-                _jwtService.GetPrincipalFromExpiredToken(
-                    request.AccessToken);
 
-            var email =
-                principal.FindFirst(ClaimTypes.Email)?.Value;
+        public async Task<AuthResponseDto> RefreshTokenAsync(
+            RefreshTokenRequestDto request)
+        {
+            var principal = _jwtService.GetPrincipalFromExpiredToken(request.AccessToken);
+
+            var email = principal.FindFirst(ClaimTypes.Email)?.Value;
 
             if (email == null)
                 throw new UnauthorizedException("Invalid token");
@@ -91,17 +91,15 @@ namespace Ecommerce_API.Services.Implementations
             if (user.RefreshToken != request.RefreshToken)
                 throw new UnauthorizedException("Invalid refresh token");
 
-            if (user.RefreshTokenExpiryTime < DateTime.Now)
+            if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 throw new UnauthorizedException("Refresh token expired");
 
-            // generate new tokens
-
             var newAccessToken = _jwtService.GenerateAccessToken(user);
-
             var newRefreshToken = _jwtService.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            user.RefreshTokenExpiryTime =
+                DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDays);
 
             await _userRepo.UpdateAsync(user);
 
@@ -109,7 +107,7 @@ namespace Ecommerce_API.Services.Implementations
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                ExpiresIn = 900
+                ExpiresIn = _jwtSettings.ExpiryMinutes * 60
             };
         }
     }

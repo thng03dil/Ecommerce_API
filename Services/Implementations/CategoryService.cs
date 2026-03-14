@@ -80,6 +80,8 @@ namespace Ecommerce_API.Services.Implementations
             category.Slug = dto.Slug;
             category.UpdatedAt = DateTime.UtcNow;
 
+            await _categoryRepo.UpdateAsync(category);
+
             var item = MapToResponseDto(category);
             return ApiResponse<CategoryResponseDto>.SuccessResponse(
                    item,

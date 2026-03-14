@@ -10,6 +10,8 @@
 
         public int ExpiryMinutes { get; set; }
 
+        public int RefreshTokenDays { get; set; }
+
     }
 }
 

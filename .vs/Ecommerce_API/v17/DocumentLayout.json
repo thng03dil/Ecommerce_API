@@ -91,8 +91,7 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T02:59:41.135Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -105,8 +104,7 @@
               "ViewState": "AQIAAGkAAAAAAAAAAAAgwIAAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T02:37:56.286Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -119,8 +117,7 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T01:43:19.089Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -133,8 +130,7 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAABCAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T01:43:42.973Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Bookmark",
@@ -150,8 +146,7 @@
               "RelativeToolTip": "Repositories\\Implementations\\UserRepo.cs",
               "ViewState": "AQIAABUAAAAAAAAAAAAowCkAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:50:14.984Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:50:14.984Z"
             },
             {
               "$type": "Document",
@@ -163,8 +158,7 @@
               "RelativeToolTip": "Data\\Configurations\\UserConfiguration.cs",
               "ViewState": "AQIAAAgAAAAAAAAAAAAQwBwAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:46:12.779Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:46:12.779Z"
             },
             {
               "$type": "Document",
@@ -176,8 +170,7 @@
               "RelativeToolTip": "Services\\Implementations\\AuthService.cs",
               "ViewState": "AQIAABEAAAAAAAAAAAAQwBMAAAAjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:19:10.029Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:19:10.029Z"
             },
             {
               "$type": "Document",
@@ -189,8 +182,7 @@
               "RelativeToolTip": "Controllers\\CategoriesController.cs",
               "ViewState": "AQIAAA4AAAAAAAAAAAAQwCIAAAAiAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T03:51:04.307Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T03:51:04.307Z"
             },
             {
               "$type": "Document",
@@ -202,8 +194,7 @@
               "RelativeToolTip": "Services\\Implementations\\JwtService.cs",
               "ViewState": "AQIAACwAAAAAAAAAAAAUwE0AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:04:26.256Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:04:26.256Z"
             },
             {
               "$type": "Document",
@@ -228,8 +219,7 @@
               "RelativeToolTip": "Controllers\\AuthController.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAAAAABYAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T03:50:56.906Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T03:50:56.906Z"
             },
             {
               "$type": "Document",
@@ -241,8 +231,7 @@
               "RelativeToolTip": "Services\\Implementations\\CategoryService.cs",
               "ViewState": "AQIAABUAAAAAAAAAAAAQwCQAAAApAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T02:41:43.19Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T02:41:43.19Z"
             },
             {
               "$type": "Document",
@@ -254,8 +243,7 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-13T04:08:50.314Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:08:50.314Z"
             },
             {
               "$type": "Document",
@@ -267,8 +255,7 @@
               "RelativeToolTip": "Services\\Interfaces\\IJwtService.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:21:49.517Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:21:49.517Z"
             },
             {
               "$type": "Document",
@@ -280,8 +267,7 @@
               "RelativeToolTip": "Helpers\\PasswordHasher.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T04:25:23.91Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T04:25:23.91Z"
             },
             {
               "$type": "Document",
@@ -293,8 +279,7 @@
               "RelativeToolTip": "Repositories\\Implementations\\CategoryRepo.cs",
               "ViewState": "AQIAADQAAAAAAAAAAAAAAFkAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T02:34:38.056Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T02:34:38.056Z"
             },
             {
               "$type": "Document",
@@ -306,8 +291,7 @@
               "RelativeToolTip": "Data\\Seed\\DataSeeder.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T02:17:21.924Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T02:17:21.924Z"
             }
           ]
         }

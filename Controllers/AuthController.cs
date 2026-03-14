@@ -34,10 +34,9 @@ namespace Ecommerce_API.Controllers
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(
-    RefreshTokenRequest request)
+    RefreshTokenRequestDto request)
         {
-            var result =
-                await _authService.RefreshTokenAsync(request);
+            var result = await _authService.RefreshTokenAsync(request);
 
             return Ok(result);
         }

@@ -7,6 +7,7 @@ using Ecommerce_API.Repositories.Interfaces;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Ecommerce_API.Repositories.Implementations
 {
     public class ProductRepo : IProductRepo
@@ -68,10 +69,10 @@ namespace Ecommerce_API.Repositories.Implementations
                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
        
-        public async Task UpdateAsync(Category category)
+        public async Task UpdateAsync(Product product)
         {
 
-            _context.Categories.Update(category);
+           _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
 

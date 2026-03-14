@@ -97,7 +97,7 @@ namespace Ecommerce_API.Services.Implementations
             product.CategoryId = dto.CategoryId;
             product.UpdatedAt = DateTime.UtcNow;
 
-            await _productRepo.SaveChangesAsync();
+            await _productRepo.UpdateAsync(product);
 
             var item = MapToResponseDto(product);
             return ApiResponse<ProductResponseDto>.SuccessResponse(

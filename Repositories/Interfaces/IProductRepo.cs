@@ -16,7 +16,7 @@ namespace Ecommerce_API.Repositories.Interfaces
 
         Task CreateAsync(Product product);
 
-        Task UpdateAsync(Category category);
+        Task UpdateAsync(Product product);
 
         Task SaveChangesAsync();
 
