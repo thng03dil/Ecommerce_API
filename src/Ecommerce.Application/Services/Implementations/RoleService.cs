@@ -86,12 +86,19 @@ namespace Ecommerce.Application.Services.Implementations
             role.UpdatedAt = DateTime.UtcNow;
 
             await _roleRepo.UpdateAsync(role);
-            return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(role), "Updated successfully");
+            return ApiResponse<RoleResponseDto>.
+                SuccessResponse(MapToResponseDto(role), "Updated successfully");
         }
         public async Task<ApiResponse<bool>> AssignPermissionsAsync(AssignPermissionsDto dto)
         {
             var role = await _roleRepo.GetByIdWithPermissionsAsync(dto.RoleId);
             if (role == null) throw new NotFoundException("Role not found");
+
+            var allExist = await _permissionRepo.AllIdsExistAsync(dto.PermissionIds);
+            if (!allExist)
+            {
+                throw new BusinessException("One or more Permission IDs do not exist.");
+            }
 
             role.RolePermissions.Clear();
 

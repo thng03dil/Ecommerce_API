@@ -29,6 +29,9 @@ namespace Ecommerce.Domain.Constants
         public const string UpdateRole = "role.update";
         public const string DeleteRole = "role.delete";
 
+        public const string ViewPermission = "permission.view";
+        public const string ViewByIdPermission = "permission.viewbyid";
+
 
     }
 }

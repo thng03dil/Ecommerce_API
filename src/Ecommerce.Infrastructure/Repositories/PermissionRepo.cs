@@ -1,7 +1,8 @@
-﻿using Ecommerce.Domain.Entities;
+﻿using Ecommerce.Application.Common.Pagination;
+using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Ecommerce.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,30 +18,42 @@ namespace Ecommerce.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Permission>> GetAllAsync()
+        public async Task<(IEnumerable<Permission>, int totalCount)> GetAllAsync(PaginationDto pagedto)
         {
-            // Permission thường là dữ liệu tĩnh, ít thay đổi
-            return await _context.Permissions
-                .AsNoTracking()
-                .OrderBy(p => p.Name)
+            var query = _context.Permissions
+                  .AsNoTracking();
+
+            var totalItem = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(p => p.Id)
+                .Skip((pagedto.PageNumber - 1) * pagedto.PageSize)
+                .Take(pagedto.PageSize)
                 .ToListAsync();
+
+            return (items, totalItem);
         }
 
         public async Task<Permission?> GetByIdAsync(int id)
         {
-            return await _context.Permissions.FindAsync(id);
+            return await _context.Permissions.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> AllIdsExistAsync(List<int> ids)
         {
             if (ids == null || !ids.Any()) return true;
 
-            // Đếm số lượng ID tồn tại trong DB so với số lượng ID gửi lên
+            // count existed permission ids in the database that match the provided ids
             var count = await _context.Permissions
                 .Where(p => ids.Contains(p.Id))
                 .CountAsync();
 
             return count == ids.Count;
+        }
+        public async Task<bool> IsPermissionIdExistAsync(int id) 
+        {
+            return await _context.Permissions.AnyAsync(p => p.Id == id);
+            
         }
     }
 }

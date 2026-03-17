@@ -51,7 +51,10 @@ namespace Ecommerce.Infrastructure.Data.Configurations
                 new Permission { Id = 16, Name =Permissions.ViewByIdRole, Description = "View role details" },
                 new Permission { Id = 17, Name =Permissions.CreateRole, Description = "Create new roles" },
                 new Permission { Id = 18, Name =Permissions.UpdateRole, Description = "Update role permissions" },
-                new Permission { Id = 19, Name =Permissions.DeleteRole, Description = "Delete roles" }
+                new Permission { Id = 19, Name =Permissions.DeleteRole, Description = "Delete roles" },
+
+                new Permission { Id = 20, Name = Permissions.ViewPermission, Description = "View permission list" },
+                new Permission { Id = 21, Name = Permissions.ViewByIdPermission, Description = "View permission details" }
     );
         }
     }

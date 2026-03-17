@@ -62,7 +62,6 @@ namespace Ecommerce.API.Controllers
             return Ok(result);
         }
 
-        // 6. Xóa Role
         [HttpDelete("{id}")]
         [Permission(Permissions.DeleteRole)]
         public async Task<IActionResult> Delete(int id)
