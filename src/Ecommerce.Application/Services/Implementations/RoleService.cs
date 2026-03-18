@@ -66,6 +66,8 @@ namespace Ecommerce.Application.Services.Implementations
                 {
                     Id = rp.Permission.Id,
                     Name = rp.Permission.Name,
+                    Entity = rp.Permission.Entity,
+                    Action = rp.Permission.Action,
                     Description = rp.Permission.Description
                 }).ToList()
             };

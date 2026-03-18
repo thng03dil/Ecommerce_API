@@ -46,6 +46,7 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             return await _context.Roles
                 .Include(r => r.RolePermissions)
+                .ThenInclude(rp => rp.Permission)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
         public async Task<bool> IsRoleInUseAsync(int roleId)

@@ -70,6 +70,9 @@ namespace Ecommerce.Infrastructure.Repositories
         public async Task<User?> GetByRefreshTokenAsync(string refreshToken) 
         {
             return await _context.Users
+                .Include(u => u.Role)
+                .ThenInclude(r => r.RolePermissions)
+                .ThenInclude(rp => rp.Permission)
                 .FirstOrDefaultAsync(x => x.RefreshToken == refreshToken && !x.IsDeleted);
         }
 
@@ -82,7 +85,6 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task UpdateAsync(User user)
         {
-            _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
 

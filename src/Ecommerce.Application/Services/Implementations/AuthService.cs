@@ -82,9 +82,18 @@ namespace Ecommerce.Application.Services.Implementations
                 throw new UnauthorizedException("Invalid email or password");
             }
 
+            var userWithPermissions = await _userRepo.GetByIdWithPermissionsAsync(user.Id);
+
+            if (userWithPermissions == null)
+            {
+                _logger.LogWarning("User not found {UserId}", userWithPermissions);
+                throw new NotFoundException("User not found");
+            }
+
+
             _logger.LogInformation("User login success: {Email}", request.Email);
 
-            var accessToken = _jwtService.GenerateAccessToken(user);
+            var accessToken = _jwtService.GenerateAccessToken(userWithPermissions);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
@@ -115,7 +124,14 @@ namespace Ecommerce.Application.Services.Implementations
                 _logger.LogWarning("Refresh token failed - email not found in token");
                 throw new UnauthorizedException("Invalid token");
             }
-            var user = await _userRepo.GetByEmailAsync(email);
+            var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(idClaim, out var userId))
+            {
+                throw new UnauthorizedException("Invalid token");
+            }
+
+            var user = await _userRepo.GetByIdWithPermissionsAsync(userId);
 
             if (user == null)
             {

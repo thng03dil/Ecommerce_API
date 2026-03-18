@@ -1,4 +1,4 @@
-﻿using Ecommerce.Domain.Common.Settings;
+using Ecommerce.Domain.Common.Settings;
 using Ecommerce.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -30,12 +30,16 @@ namespace Ecommerce.Infrastructure.SecurityHelpers
 
         public string GenerateAccessToken(User user)
         {
+            if (user.Role == null)
+            {
+                throw new InvalidOperationException("User Role is not loaded when generating token. Please ensure Role and Permissions are included when fetching the User from the database.");
+            }
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role?.Name ?? "User")
-
+                new Claim(ClaimTypes.Role, user.Role.Name)
             };
 
             if (user.Role?.RolePermissions != null)
