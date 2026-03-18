@@ -23,6 +23,7 @@ namespace Ecommerce.Infrastructure.Repositories
             var query = _context.Roles
                    .AsNoTracking()
                    .Include(x => x.RolePermissions)
+                   .ThenInclude(rp => rp.Permission)
                    .Where(x => !x.IsDeleted);
 
             var totalItem = await query.CountAsync();

@@ -169,6 +169,10 @@ namespace Ecommerce.Application.Services.Implementations
             Id = role.Id,
             Name = role.Name,
             Description = role.Description,
+            Permissions = role.RolePermissions
+                        .Where(rp => rp.Permission != null)
+                        .Select(rp => rp.Permission.Name)
+                        .ToList(),
             CreatedAt = role.CreatedAt,
             UpdatedAt = role.UpdatedAt
         };
