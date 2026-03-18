@@ -6,11 +6,9 @@ using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Domain.Common.Settings;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
-using System.Linq;
 
 namespace Ecommerce.Application.Services.Implementations
 {

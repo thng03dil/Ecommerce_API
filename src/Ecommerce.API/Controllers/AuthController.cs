@@ -1,11 +1,8 @@
 using Azure.Core;
 using Ecommerce.Application.Services.Interfaces;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Application.DTOs.Auth;
 using Ecommerce.Application.DTOs.Common;
-using Microsoft.AspNetCore.Authorization;
-using Ecommerce.Application.Extensions;
 
 namespace Ecommerce.API.Controllers
 {

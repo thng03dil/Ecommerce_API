@@ -1,8 +1,6 @@
 using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Ecommerce.API.Controllers
 {

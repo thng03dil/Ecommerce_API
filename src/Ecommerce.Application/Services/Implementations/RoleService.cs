@@ -7,10 +7,7 @@ using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Security;
-using System.Text;
+
 
 namespace Ecommerce.Application.Services.Implementations
 {
@@ -52,7 +49,7 @@ namespace Ecommerce.Application.Services.Implementations
             var role = await _roleRepo.GetByIdWithPermissionsAsync(id);
             if (role == null)
             {
-                _logger.LogWarning("Update failed: permission not found {PermissionId}", id);
+                _logger.LogWarning("Get failed: permission not found {PermissionId}", id);
 
                 throw new NotFoundException("Role not found");
             }
@@ -62,14 +59,17 @@ namespace Ecommerce.Application.Services.Implementations
                 Id = role.Id,
                 Name = role.Name,
                 Description = role.Description,
-                Permissions = role.RolePermissions.Select(rp => new PermissionResponseDto
-                {
-                    Id = rp.Permission.Id,
-                    Name = rp.Permission.Name,
-                    Entity = rp.Permission.Entity,
-                    Action = rp.Permission.Action,
-                    Description = rp.Permission.Description
-                }).ToList()
+                Permissions = role.RolePermissions
+                            .Where(rp => rp.Permission != null)
+                            .Select(rp => new PermissionResponseDto
+                            {
+                                Id = rp.Permission!.Id,
+                                Name = rp.Permission.Name,
+                                Entity = rp.Permission.Entity,
+                                Action = rp.Permission.Action,
+                                Description = rp.Permission.Description
+                            })
+                            .ToList()
             };
 
             return ApiResponse<RoleWithPermissionsDto>.SuccessResponse(dto);
@@ -83,25 +83,35 @@ namespace Ecommerce.Application.Services.Implementations
                 _logger.LogWarning("Create fail: Role {Name} already exists", dto.Name);
                 throw new BusinessException("Role name already exists");
             }
+            if (dto.PermissionIds != null && dto.PermissionIds.Any())
+            {
+                var allExist = await _permissionRepo.AllIdsExistAsync(dto.PermissionIds);
+                if (!allExist)
+                {
+                    throw new BusinessException("One or more Permission IDs do not exist.");
+                }
+            }
             var role = new Role
             {
                 Name = dto.Name,
-                Description = dto.Description
+                Description = dto.Description,
+                RolePermissions = dto.PermissionIds?
+                    .Distinct()
+                    .Select(pId => new RolePermission
+                    {
+                        PermissionId = pId
+                    }).ToList() ?? new List<RolePermission>()
             };
 
             await _roleRepo.AddAsync(role);
 
-            if (dto.PermissionIds != null && dto.PermissionIds.Any())
+            var createdRole = await _roleRepo.GetByIdWithPermissionsAsync(role.Id);
+            if (createdRole == null)
             {
-                // Reuse existing business rules for assigning permissions.
-                await AssignPermissionsAsync(new AssignPermissionsDto
-                {
-                    RoleId = role.Id,
-                    PermissionIds = dto.PermissionIds
-                });
+                throw new Exception("Role just created but not found"); 
             }
 
-            return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(role), "Created successfully");
+            return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(createdRole), "Created successfully");
         }
         public async Task<ApiResponse<RoleResponseDto>> UpdateAsync(int id, RoleUpdateDto dto)
         {
@@ -119,8 +129,14 @@ namespace Ecommerce.Application.Services.Implementations
             role.UpdatedAt = DateTime.UtcNow;
 
             await _roleRepo.UpdateAsync(role);
+
+            var updatedRole = await _roleRepo.GetByIdWithPermissionsAsync(id);
+
+            if (updatedRole == null)
+                throw new NotFoundException("Role not found after update");
+
             return ApiResponse<RoleResponseDto>.
-                SuccessResponse(MapToResponseDto(role), "Updated successfully");
+                SuccessResponse(MapToResponseDto(updatedRole), "Updated successfully");
         }
         public async Task<ApiResponse<bool>> AssignPermissionsAsync(AssignPermissionsDto dto)
         {

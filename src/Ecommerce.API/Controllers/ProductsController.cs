@@ -3,7 +3,6 @@ using Ecommerce.Application.Common.Pagination;
 using Ecommerce.Application.DTOs.ProductDtos;
 using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Domain.Common.Filters;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers

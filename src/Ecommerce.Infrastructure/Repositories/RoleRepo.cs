@@ -2,12 +2,8 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Infrastructure.Data;
-
-
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace Ecommerce.Infrastructure.Repositories
 {
@@ -40,6 +36,7 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             return await _context.Roles
                     .Include(c => c.RolePermissions)
+                    .ThenInclude(rp => rp.Permission)
                     .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
         public async Task<Role?> GetByIdWithPermissionsAsync(int id)
@@ -47,7 +44,7 @@ namespace Ecommerce.Infrastructure.Repositories
             return await _context.Roles
                 .Include(r => r.RolePermissions)
                 .ThenInclude(rp => rp.Permission)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
         }
         public async Task<bool> IsRoleInUseAsync(int roleId)
         {
