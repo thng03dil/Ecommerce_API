@@ -52,13 +52,13 @@ namespace Ecommerce.API.Controllers
         //    return OkResponse(result);
         //}
 
-        [Authorize]
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            var userId = User.GetUserId();
-            await _authService.LogoutAsync(userId);
-            return OkResponse("Logged out successfully");
-        }
+        //[Authorize]
+        //[HttpPost("logout")]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    var userId = User.GetUserId();
+        //    await _authService.LogoutAsync(userId);
+        //    return OkResponse("Logged out successfully");
+        //}
     }
 }
