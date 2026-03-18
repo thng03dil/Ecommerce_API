@@ -43,14 +43,14 @@ namespace Ecommerce.API.Controllers
             return OkResponse(result);
         }
 
-        [Authorize]
-        [HttpGet("me")]
-        public async Task<IActionResult> Me()
-        {
-            var userId = User.GetUserId();
-            var result = await _authService.GetMeAsync(userId);
-            return OkResponse(result);
-        }
+        //[Authorize]
+        //[HttpGet("me")]
+        //public async Task<IActionResult> Me()
+        //{
+        //    var userId = User.GetUserId();
+        //    var result = await _authService.GetMeAsync(userId);
+        //    return OkResponse(result);
+        //}
 
         [Authorize]
         [HttpPost("logout")]
