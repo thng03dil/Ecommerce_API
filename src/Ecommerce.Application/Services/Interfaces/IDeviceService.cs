@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Ecommerce.Application.Services.Interfaces
+{
+    public interface IDeviceService
+    {
+        string GetIpAddress();
+        string GetUserAgent();
+        string GenerateDeviceId(string userAgent, string ip);
+    }
+}

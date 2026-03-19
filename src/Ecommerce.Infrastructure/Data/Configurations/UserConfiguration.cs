@@ -14,7 +14,7 @@ namespace Ecommerce.Infrastructure.Data.Configurations
 
             builder.Property(x => x.Email)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(256);
 
             builder.HasIndex(x => x.Email)
                 .IsUnique();
@@ -24,7 +24,7 @@ namespace Ecommerce.Infrastructure.Data.Configurations
                 .HasMaxLength(255);
 
             builder.Property(x => x.RoleId)
-           .IsRequired();
+            .IsRequired();
 
             builder.Property(x => x.CreatedAt)
               .IsRequired()
@@ -37,6 +37,11 @@ namespace Ecommerce.Infrastructure.Data.Configurations
                  .WithMany(r => r.Users)       
                  .HasForeignKey(u => u.RoleId)  
                  .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(x => x.RefreshTokens)
+                  .WithOne(t => t.User)
+                  .HasForeignKey(t => t.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

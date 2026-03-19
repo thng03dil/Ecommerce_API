@@ -53,7 +53,7 @@ namespace Ecommerce.Infrastructure.Data.Seed
                 context.Users.Add(new User
                 {
                     Email = "admin@example.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     RoleId = 1, // Admin
                     CreatedAt = DateTime.UtcNow,
                     IsDeleted = false

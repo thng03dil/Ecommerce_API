@@ -7,17 +7,19 @@ using Ecommerce.Domain.Common.Settings;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Data.Seed;
-using Ecommerce.Infrastructure.Redis;
+using Ecommerce.Infrastructure.RedisCaching;
 using Ecommerce.Infrastructure.Repositories;
 using Ecommerce.Infrastructure.SecurityHelpers;
+using Ecommerce.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using StackExchange.Redis;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -42,10 +44,35 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "Ecommerce:";
 });
 
+// Redis Configuration
+var redisConn = builder.Configuration["Redis:ConnectionString"];
+var instanceName = builder.Configuration["Redis:InstanceName"] ?? "Ecommerce:";
+
+if (!string.IsNullOrEmpty(redisConn))
+{
+    // Register Multiplexer (Singleton) for advanced Redis ops inside RedisCacheService
+    builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    {
+        var configuration = ConfigurationOptions.Parse(redisConn, true);
+        configuration.AbortOnConnectFail = false;
+        return ConnectionMultiplexer.Connect(configuration);
+    });
+
+    // Register Distributed Cache
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConn;
+        options.InstanceName = instanceName;
+    });
+}
+
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+
 //Register Repository
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<IProductRepo, ProductRepo>(); 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IRefreshTokenRepo , RefreshTokenRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<IPermissionRepo, PermissionRepo>();
 
@@ -53,14 +80,18 @@ builder.Services.AddScoped<IPermissionRepo, PermissionRepo>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
-builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+
 
 builder.Services.AddControllers();
+
+builder.Services.AddHttpContextAccessor();
 
 //configure validation error response format
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -170,6 +201,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
@@ -231,6 +263,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.UseSerilogRequestLogging(options =>
 {

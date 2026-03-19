@@ -41,6 +41,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     Entity = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Action = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    IsSystem = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -124,11 +125,9 @@ namespace Ecommerce.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -144,40 +143,58 @@ namespace Ecommerce.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Categories",
-                columns: new[] { "Id", "CreatedAt", "Description", "IsDeleted", "Name", "Slug", "UpdatedAt" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
                 {
-                    { 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Các loại smartphone mới nhất", false, "Điện thoại", "dien-thoai", null },
-                    { 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Máy tính xách tay làm việc và chơi game", false, "Laptop", "laptop", null },
-                    { 3, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Tai nghe, sạc, cáp...", false, "Phụ kiện", "phu-kien", null }
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TokenHash = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Permissions",
-                columns: new[] { "Id", "Action", "CreatedAt", "Description", "Entity", "IsDeleted", "Name", "UpdatedAt" },
+                columns: new[] { "Id", "Action", "CreatedAt", "Description", "Entity", "IsDeleted", "IsSystem", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read products", "product", false, "product.read", null },
-                    { 2, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create products", "product", false, "product.create", null },
-                    { 3, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update products", "product", false, "product.update", null },
-                    { 4, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete products", "product", false, "product.delete", null },
-                    { 5, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read categories", "category", false, "category.read", null },
-                    { 6, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create categories", "category", false, "category.create", null },
-                    { 7, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update categories", "category", false, "category.update", null },
-                    { 8, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete categories", "category", false, "category.delete", null },
-                    { 9, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read users", "user", false, "user.read", null },
-                    { 10, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update users", "user", false, "user.update", null },
-                    { 11, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete users", "user", false, "user.delete", null },
-                    { 12, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read roles", "role", false, "role.read", null },
-                    { 13, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create roles", "role", false, "role.create", null },
-                    { 14, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update role permissions", "role", false, "role.update", null },
-                    { 15, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete roles", "role", false, "role.delete", null },
-                    { 16, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read permissions", "permission", false, "permission.read", null },
-                    { 17, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create permissions", "permission", false, "permission.create", null },
-                    { 18, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update permissions", "permission", false, "permission.update", null },
-                    { 19, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete permissions", "permission", false, "permission.delete", null }
+                    { 1, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read products", "product", false, true, "product.read", null },
+                    { 2, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create products", "product", false, true, "product.create", null },
+                    { 3, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update products", "product", false, true, "product.update", null },
+                    { 4, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete products", "product", false, true, "product.delete", null },
+                    { 5, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read categories", "category", false, true, "category.read", null },
+                    { 6, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create categories", "category", false, true, "category.create", null },
+                    { 7, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update categories", "category", false, true, "category.update", null },
+                    { 8, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete categories", "category", false, true, "category.delete", null },
+                    { 9, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read users", "user", false, true, "user.read", null },
+                    { 10, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update users", "user", false, true, "user.update", null },
+                    { 11, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete users", "user", false, true, "user.delete", null },
+                    { 12, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read roles", "role", false, true, "role.read", null },
+                    { 13, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create roles", "role", false, true, "role.create", null },
+                    { 14, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update role permissions", "role", false, true, "role.update", null },
+                    { 15, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete roles", "role", false, true, "role.delete", null },
+                    { 16, "read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Read permissions", "permission", false, true, "permission.read", null },
+                    { 17, "create", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create permissions", "permission", false, true, "permission.create", null },
+                    { 18, "update", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update permissions", "permission", false, true, "permission.update", null },
+                    { 19, "delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete permissions", "permission", false, true, "permission.delete", null }
                 });
 
             migrationBuilder.InsertData(
@@ -187,19 +204,6 @@ namespace Ecommerce.Infrastructure.Migrations
                 {
                     { 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System administrator with full access", false, "Admin", null },
                     { 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Registered user with limited access", false, "User", null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Products",
-                columns: new[] { "Id", "CategoryId", "CreatedAt", "Description", "IsDeleted", "Name", "Price", "Stock", "UpdatedAt" },
-                values: new object[,]
-                {
-                    { 1, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Chip A17 Pro mạnh mẽ", false, "iPhone 15 Pro", 25000000m, 20, null },
-                    { 2, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Flagship AI 2024", false, "Samsung Galaxy S24", 22000000m, 15, null },
-                    { 3, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Siêu mỏng nhẹ", false, "MacBook Air M2", 28000000m, 10, null },
-                    { 4, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Màn hình vô cực", false, "Dell XPS 13", 32000000m, 8, null },
-                    { 5, 3, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Chống ồn chủ động", false, "AirPods Pro 2", 6000000m, 30, null },
-                    { 6, 3, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Cổng Type-C tiện lợi", false, "Sạc nhanh 65W", 500000m, 50, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -226,6 +230,16 @@ namespace Ecommerce.Infrastructure.Migrations
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_TokenHash",
+                table: "RefreshTokens",
+                column: "TokenHash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
@@ -257,13 +271,16 @@ namespace Ecommerce.Infrastructure.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Permissions");

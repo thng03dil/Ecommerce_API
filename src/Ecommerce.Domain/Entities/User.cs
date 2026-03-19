@@ -11,9 +11,21 @@
 
         public Role Role { get; set; } = null!;
 
-        public string? RefreshToken { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; private set; }
+             = new List<RefreshToken>();
 
-        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public void AddRefreshToken(RefreshToken token)
+        {
+            RefreshTokens.Add(token);
+        }
+
+        public void RevokeAllTokens()
+        {
+            foreach (var token in RefreshTokens)
+            {
+                token.Revoke();
+            }
+        }
     }
 }
 

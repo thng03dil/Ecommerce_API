@@ -31,12 +31,13 @@ namespace Ecommerce.Infrastructure.SecurityHelpers
         public string GenerateAccessToken(User user)
         {
             if (user.Role == null)
-            {
                 throw new InvalidOperationException("User Role is not loaded when generating token. Please ensure Role and Permissions are included when fetching the User from the database.");
-            }
+            
 
             var claims = new List<Claim>
             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.Name)
@@ -77,7 +78,10 @@ namespace Ecommerce.Infrastructure.SecurityHelpers
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
 
-            return Convert.ToBase64String(randomBytes);
+            return Convert.ToBase64String(randomBytes)
+                            .Replace("+", "")
+                            .Replace("/", "")
+                            .Replace("=", "");
         }
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
@@ -93,7 +97,8 @@ namespace Ecommerce.Infrastructure.SecurityHelpers
 
                 ValidIssuer = _jwtSettings.Issuer,
                 ValidAudience = _jwtSettings.Audience,
-                IssuerSigningKey = key
+                IssuerSigningKey = key,
+                ClockSkew = TimeSpan.Zero
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -112,6 +117,14 @@ namespace Ecommerce.Infrastructure.SecurityHelpers
             }
 
             return principal;
+        }
+        public string HashToken(string token)
+        {
+            if (string.IsNullOrEmpty(token)) return string.Empty;
+
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(token));
+            return Convert.ToBase64String(bytes);
         }
     }
 }

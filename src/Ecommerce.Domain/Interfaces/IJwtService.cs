@@ -10,6 +10,7 @@ namespace Ecommerce.Domain.Interfaces
         string GenerateRefreshToken();
 
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        string HashToken(string token);
     }
 }
   

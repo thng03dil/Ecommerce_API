@@ -6,7 +6,6 @@ using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.Application.Services.Implementations
 {
@@ -51,7 +50,7 @@ namespace Ecommerce.Application.Services.Implementations
             user.RoleId = dto.RoleId;
             user.UpdatedAt = DateTime.UtcNow;
 
-            await _userRepo.UpdateAsync(user);
+            await _userRepo.AddAsync(user);
 
             var item = MapToResponseDto(user);
             return ApiResponse<UserResponseDto>.SuccessResponse(

@@ -51,6 +51,7 @@ namespace Ecommerce.Infrastructure.Repositories
         public async Task<User?> GetByIdForUpdateAsync(int id)
         {
             return await _context.Users
+                .Include(u => u.RefreshTokens)
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
         public async Task<User?> GetByEmailAsync(string email)
@@ -67,14 +68,7 @@ namespace Ecommerce.Infrastructure.Repositories
             return await _context.Users.AnyAsync(x => x.Email == email && !x.IsDeleted);
         }
 
-        public async Task<User?> GetByRefreshTokenAsync(string refreshToken) 
-        {
-            return await _context.Users
-                .Include(u => u.Role)
-                .ThenInclude(r => r.RolePermissions)
-                .ThenInclude(rp => rp.Permission)
-                .FirstOrDefaultAsync(x => x.RefreshToken == refreshToken && !x.IsDeleted);
-        }
+        
 
         public async Task AddAsync(User user)
         {
@@ -83,10 +77,6 @@ namespace Ecommerce.Infrastructure.Repositories
 
         }
 
-        public async Task UpdateAsync(User user)
-        {
-            await _context.SaveChangesAsync();
-        }
 
         public async Task SaveChangesAsync()
         {

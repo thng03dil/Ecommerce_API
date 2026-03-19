@@ -3,6 +3,8 @@ using Ecommerce.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Application.DTOs.Auth;
 using Ecommerce.Application.DTOs.Common;
+using Ecommerce.Application.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce.API.Controllers
 {
@@ -49,13 +51,21 @@ namespace Ecommerce.API.Controllers
         //    return OkResponse(result);
         //}
 
-        //[Authorize]
-        //[HttpPost("logout")]
-        //public async Task<IActionResult> Logout()
-        //{
-        //    var userId = User.GetUserId();
-        //    await _authService.LogoutAsync(userId);
-        //    return OkResponse("Logged out successfully");
-        //}
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.GetUserId();
+            var authHeader = Request.Headers["Authorization"].ToString();
+            var accessToken = authHeader.Replace("Bearer ", "").Trim();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return BadRequest(new { message = "Invalid token" });
+            }
+
+            await _authService.LogoutAsync(userId, accessToken);
+            return OkResponse("Logged out successfully");
+        }
     }
 }

@@ -34,39 +34,7 @@ namespace Ecommerce.Infrastructure.Data.Configurations
             builder.Property(x => x.UpdatedAt)
                 .IsRequired(false);
 
-            //create category data
-            builder.HasData(
-             new Category
-             {
-                 Id = 1,
-                 Name = "Điện thoại",
-                 Description = "Các loại smartphone mới nhất",
-                 Slug = "dien-thoai",
-                 IsDeleted = false,
-                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                 UpdatedAt = null
-             },
-             new Category
-             {
-                 Id = 2,
-                 Name = "Laptop",
-                 Description = "Máy tính xách tay làm việc và chơi game",
-                 Slug = "laptop",
-                 IsDeleted = false,
-                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                  UpdatedAt = null
-             },
-             new Category
-             {
-                 Id = 3,
-                 Name = "Phụ kiện",
-                 Description = "Tai nghe, sạc, cáp...",
-                 Slug = "phu-kien",
-                 IsDeleted = false,
-                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                 UpdatedAt = null
-             }
-         );
+            
         }
     }
 }
