@@ -10,7 +10,7 @@ namespace Ecommerce.Domain.Interfaces
 
         Task LoadCategoryAsync(Product product); 
 
-        Task CreateAsync(Product product);
+        Task AddAsync(Product product);
 
         Task UpdateAsync(Product product);
 

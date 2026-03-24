@@ -70,10 +70,9 @@ namespace Ecommerce.Infrastructure.Repositories
                 .AnyAsync(c => c.Id == categoryId && !c.IsDeleted);
         }
 
-        public async Task CreateAsync(Product product)
+        public async Task AddAsync(Product product)
         {
             await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
         }
         //Explicit Loading (Tải tường minh) nạp bù dữ liệu
         public async Task LoadCategoryAsync(Product product)
@@ -87,6 +86,7 @@ namespace Ecommerce.Infrastructure.Repositories
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
        

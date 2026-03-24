@@ -9,6 +9,7 @@ namespace Ecommerce.Domain.Entities
         public string? Description { get; set; } = string.Empty;
 
         public string Slug { get; set; } = string.Empty;
+        public string ? ImageUrl { get; set; } = string.Empty;
 
         public ICollection<Product> Products { get; set; } = new List<Product>();
     }   

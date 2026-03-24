@@ -42,15 +42,26 @@ namespace Ecommerce.API.Middleware
                 statusCode = baseEx.StatusCode;
                 errorCode = baseEx.ErrorCode;
                 message = baseEx.Message;
-            }
 
-            _logger.LogError(
-                 exception,
-                 "Request failed {Method} {Path} TraceId:{TraceId}",
-                 context.Request.Method,
-                 context.Request.Path,
-                 context.TraceIdentifier
-             );
+                _logger.LogWarning(
+                    "[{ErrorCode}] {Message} | {Method} {Path} | TraceId: {TraceId}",
+                    errorCode,
+                    message,
+                    context.Request.Method,
+                    context.Request.Path,
+                    context.TraceIdentifier
+                     );
+            }
+            else
+            {
+                _logger.LogError(
+                     exception,
+                     "SYSTEM CRITICAL ERROR: {Method} {Path} | TraceId: {TraceId}",
+                     context.Request.Method,
+                     context.Request.Path,
+                     context.TraceIdentifier
+                 );
+            }
 
             var response = new ErrorResponseDto
             {

@@ -15,6 +15,8 @@ namespace Ecommerce.Application.Services.Implementations
     {
         private static readonly TimeSpan CategoryCacheTtl = TimeSpan.FromHours(1);
         private static readonly SemaphoreSlim _listLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _itemLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _writeLock = new(1, 1);
 
         private readonly ICategoryRepo _categoryRepo;
         private readonly ICacheService _cacheService;
@@ -61,31 +63,45 @@ namespace Ecommerce.Application.Services.Implementations
         public async Task<ApiResponse<CategoryResponseDto?>> GetByIdAsync(int id)
         {
             var cacheKey = CacheKeyGenerator.Category(id);
+            var item = await _cacheService.GetAsync<CategoryResponseDto>(cacheKey);
+            if (item != null)
+                return ApiResponse<CategoryResponseDto?>.SuccessResponse(item, "Get data successfully");
 
-            var item = await _cacheService.GetOrSetAsync(cacheKey, async () =>
+            await _itemLoadLock.WaitAsync();
+            try
             {
-                var category = await _categoryRepo.GetByIdAsync(id);
-                if (category == null) return null;
-                return MapToResponseDto(category);
-            }, CategoryCacheTtl);
+                //  Double-check sau khi vào Lock
+                item = await _cacheService.GetAsync<CategoryResponseDto>(cacheKey);
+                if (item != null) return ApiResponse<CategoryResponseDto?>.SuccessResponse(item, "Get data successfully");
 
-            if (item == null)
-                throw new NotFoundException("Category not found");
+                var category = await _categoryRepo.GetByIdAsync(id);
+                if (category == null) throw new NotFoundException("Category not found");
+
+                item = MapToResponseDto(category);
+                await _cacheService.SetAsync(cacheKey, item, CategoryCacheTtl);
+            }
+            finally {
+                _itemLoadLock.Release();
+            }
 
             return ApiResponse<CategoryResponseDto?>.SuccessResponse(item, "Get data successfully");
         }
 
         public async Task<ApiResponse<CategoryResponseDto>> CreateAsync(CategoryCreateDto dto)
         {
-            var category = new Category
+            await _writeLock.WaitAsync();
+            try
             {
+                var category = new Category
+                {
                 Name = dto.Name,
                 Description = dto.Description,
                 Slug = dto.Slug,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null
-            };
-            await _categoryRepo.CreateAsync(category);
+                };
+            await _categoryRepo.AddAsync(category);
+            await _categoryRepo.SaveChangesAsync();
 
             await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
 
@@ -94,54 +110,72 @@ namespace Ecommerce.Application.Services.Implementations
                    item,
                     "Create data successfully"
                     );
+            }
+            finally { _writeLock.Release(); }
         }
 
         public async Task<ApiResponse<CategoryResponseDto>> UpdateAsync(int id, CategoryUpdateDto dto)
         {
-            var category = await _categoryRepo.GetByIdForUpdateAsync(id);
-            if (category == null) throw new NotFoundException("Category not found");
+            await _writeLock.WaitAsync();
+            try
+            {
+                    var category = await _categoryRepo.GetByIdForUpdateAsync(id);
+                if (category == null) throw new NotFoundException("Category not found");
 
-            category.Name = dto.Name;
-            category.Description = dto.Description;
-            category.Slug = dto.Slug;
-            category.UpdatedAt = DateTime.UtcNow;
+                category.Name = dto.Name;
+                category.Description = dto.Description;
+                category.Slug = dto.Slug;
+                category.UpdatedAt = DateTime.UtcNow;
 
-            await _categoryRepo.UpdateAsync(category);
+                await _categoryRepo.UpdateAsync(category);
 
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Category(id));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Category(id));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
 
-            var item = MapToResponseDto(category);
-            return ApiResponse<CategoryResponseDto>.SuccessResponse(
-                   item,
-                   "Update data successfully"
-                   );
+                var item = MapToResponseDto(category);
+                return ApiResponse<CategoryResponseDto>.SuccessResponse(
+                       item,
+                       "Update data successfully"
+                       );
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
         }
 
         public async Task<ApiResponse<CategoryResponseDto>> DeleteAsync(int id)
         {
-            var category = await _categoryRepo.GetByIdForUpdateAsync(id);
-
-            if (category == null)
+            await _writeLock.WaitAsync();
+            try
             {
-                throw new NotFoundException("Category not found");
+                var category = await _categoryRepo.GetByIdForUpdateAsync(id);
+
+                if (category == null)
+                {
+                    throw new NotFoundException("Category not found");
+                }
+
+                if (await _categoryRepo.HasActiveProductsAsync(id))
+                    throw new BadRequestException("Cannot delete category with linked products");
+
+                category.IsDeleted = true;
+
+                await _categoryRepo.SaveChangesAsync();
+
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Category(id));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
+
+                var item = MapToResponseDto(category);
+                return ApiResponse<CategoryResponseDto>.SuccessResponse(
+                         item,
+                        "Delete data successfully"
+                );
             }
-
-            if (await _categoryRepo.HasActiveProductsAsync(id))
-                throw new BadRequestException("Cannot delete category with linked products");
-
-            category.IsDeleted = true;
-
-            await _categoryRepo.SaveChangesAsync();
-
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Category(id));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
-
-            var item = MapToResponseDto(category);
-            return ApiResponse<CategoryResponseDto>.SuccessResponse(
-                     item,
-                    "Delete data successfully"
-            );
+            finally
+            {
+                _writeLock.Release();
+            }
         }
         private static CategoryResponseDto MapToResponseDto(Category c) => new()
         {

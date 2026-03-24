@@ -10,7 +10,7 @@ namespace Ecommerce.Domain.Interfaces
         
             Task<Category?> GetByIdAsync(int id);
 
-            Task CreateAsync(Category category);
+            Task AddAsync(Category category);
 
             Task UpdateAsync(Category category); 
 

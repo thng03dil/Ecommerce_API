@@ -15,6 +15,8 @@ namespace Ecommerce.Application.Services.Implementations
     {
         private static readonly TimeSpan ProductCacheTtl = TimeSpan.FromMinutes(10);
         private static readonly SemaphoreSlim _listLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _itemLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _writeLock = new(1, 1);
 
         private readonly IProductRepo _productRepo;
         private readonly ICacheService _cacheService;
@@ -47,6 +49,7 @@ namespace Ecommerce.Application.Services.Implementations
 
                 var (products, totalItems) = await _productRepo.GetFilteredAsync(filter, pagination);
                 var data = products.Select(MapToResponseDto).ToList();
+
                 pagedData = new PagedResponse<ProductResponseDto>(data, pagination.PageNumber, pagination.PageSize, totalItems);
                 await _cacheService.SetAsync(cacheKey, pagedData, ProductCacheTtl);
             }
@@ -62,103 +65,153 @@ namespace Ecommerce.Application.Services.Implementations
         {
             var cacheKey = CacheKeyGenerator.Product(id);
 
-            var item = await _cacheService.GetOrSetAsync(cacheKey, async () =>
-            {
-                var product = await _productRepo.GetByIdAsync(id);
-                if (product == null) return null;
-                return MapToResponseDto(product);
-            }, ProductCacheTtl);
+            // kt từ Cache lần 1
+            var item = await _cacheService.GetAsync<ProductResponseDto>(cacheKey);
+            if (item != null)
+                return ApiResponse<ProductResponseDto?>.SuccessResponse(item, "Get data successfully");
 
-            if (item == null)
-                throw new NotFoundException("Product not found");
+            // use semaphorelock
+            await _itemLoadLock.WaitAsync();
+            try
+            {
+                //  Double-check 
+                item = await _cacheService.GetAsync<ProductResponseDto>(cacheKey);
+                if (item != null)
+                    return ApiResponse<ProductResponseDto?>.SuccessResponse(item, "Get data successfully");
+
+                // vào Database
+                var product = await _productRepo.GetByIdAsync(id);
+
+                if (product == null)
+                    throw new NotFoundException($"Product with ID {id} not found");
+
+                item = MapToResponseDto(product);
+
+                // Lưu vào Cache 
+                await _cacheService.SetAsync(cacheKey, item, ProductCacheTtl);
+            }
+            finally
+            {
+                _itemLoadLock.Release();
+            }
 
             return ApiResponse<ProductResponseDto?>.SuccessResponse(item, "Get data successfully");
         }
 
         public async Task<ApiResponse<ProductResponseDto>> CreateAsync(ProductCreateDto dto)
         {
-            var categoryExist = await _productRepo.CategoryExistsAsync(dto.CategoryId);
+            await _writeLock.WaitAsync();
+            try
+            {
+                var categoryExist = await _productRepo.CategoryExistsAsync(dto.CategoryId);
 
             if (!categoryExist) throw new NotFoundException("Category not found");
 
             var product = new Product
             {
                 CategoryId = dto.CategoryId,
-                Name = dto.Name,
+                Name = dto.Name?.Trim() ?? string.Empty,
                 Price = dto.Price,
-                Description = dto.Description,
+                Description = dto.Description?.Trim() ?? string.Empty,
                 Stock = dto.Stock,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null
             };
 
-            await _productRepo.CreateAsync(product);
+            await _productRepo.AddAsync(product);
+            await _productRepo.SaveChangesAsync();
 
             await _productRepo.LoadCategoryAsync(product);
 
             await _cacheService.IncrementAsync(CacheKeyGenerator.ProductVersionKey());
+            await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
 
-            var item = MapToResponseDto(product);
+                var item = MapToResponseDto(product);
             return ApiResponse<ProductResponseDto>.SuccessResponse(
                      item,
                      "Create data successfully"
                     );
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
         }
 
         public async Task<ApiResponse<ProductResponseDto>> UpdateAsync(int id, ProductUpdateDto dto)
         {
-            var product = await _productRepo.GetByIdAsync(id);
-            if (product == null)
-                throw new NotFoundException("Product not found");
-
-            if (dto.CategoryId != 0)
+            await _writeLock.WaitAsync();
+            try
             {
-                var categoryExists = await _productRepo.CategoryExistsAsync(dto.CategoryId);
+                var product = await _productRepo.GetByIdAsync(id);
+                if (product == null)
+                    throw new NotFoundException("Product not found");
 
-                if (!categoryExists)
+                if (dto.CategoryId != 0 && dto.CategoryId != product.CategoryId)
                 {
-                    throw new NotFoundException("Category not found");
+                    var categoryExists = await _productRepo.CategoryExistsAsync(dto.CategoryId);
+
+                    if (!categoryExists)
+                    {
+                        throw new NotFoundException("Category not found");
+                    }
+                    product.CategoryId = dto.CategoryId;
                 }
+
+                product.Name = dto.Name;
+                product.Price = dto.Price;
+                product.Description = dto.Description;
+                product.Stock = dto.Stock;
                 product.CategoryId = dto.CategoryId;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                await _productRepo.UpdateAsync(product);
+
+                await _productRepo.LoadCategoryAsync(product);
+
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Product(id));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.ProductVersionKey());
+                await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
+
+                var item = MapToResponseDto(product);
+                return ApiResponse<ProductResponseDto>.SuccessResponse(
+                          item,
+                          "Update data successfully"
+                         );
             }
-
-            product.Name = dto.Name;
-            product.Price = dto.Price;
-            product.Description = dto.Description;
-            product.Stock = dto.Stock;
-            product.CategoryId = dto.CategoryId;
-            product.UpdatedAt = DateTime.UtcNow;
-
-            await _productRepo.UpdateAsync(product);
-
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Product(id));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.ProductVersionKey());
-
-            var item = MapToResponseDto(product);
-            return ApiResponse<ProductResponseDto>.SuccessResponse(
-                      item,
-                      "Update data successfully"
-                     );
+            finally
+            {
+                _writeLock.Release();
+            }
         }
 
         public async Task<ApiResponse<ProductResponseDto>> DeleteAsync(int id)
         {
-            var product = await _productRepo.GetByIdAsync(id);
+            await _writeLock.WaitAsync();
+            try
+            {
+                var product = await _productRepo.GetByIdAsync(id);
 
-            if (product == null) throw new NotFoundException("Product not found");
+                if (product == null) throw new NotFoundException("Product not found");
 
-            product.IsDeleted = true;
-            await _productRepo.SaveChangesAsync();
+                product.IsDeleted = true;
+                await _productRepo.SaveChangesAsync();
 
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Product(id));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.ProductVersionKey());
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Product(id));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.ProductVersionKey());
+                await _cacheService.IncrementAsync(CacheKeyGenerator.CategoryVersionKey());
 
-            var item = MapToResponseDto(product);
+                var item = MapToResponseDto(product);
 
-            return ApiResponse<ProductResponseDto>.SuccessResponse(
-                    item,
-                   "Delete data successfully"
-                   );
+                return ApiResponse<ProductResponseDto>.SuccessResponse(
+                        item,
+                       "Delete data successfully"
+                       );
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
         }
         private static ProductResponseDto MapToResponseDto(Product p) => new()
         {
@@ -168,7 +221,7 @@ namespace Ecommerce.Application.Services.Implementations
             Price = p.Price,
             Stock = p.Stock,
             CategoryId = p.CategoryId,
-            CategoryName = p.Category!.Name
+            CategoryName = p.Category?.Name ?? "Unknown"
         };
     }
 }

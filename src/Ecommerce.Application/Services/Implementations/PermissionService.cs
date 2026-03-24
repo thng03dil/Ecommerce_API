@@ -14,19 +14,27 @@ namespace Ecommerce.Application.Services.Implementations
     {
         private static readonly TimeSpan PermissionCacheTtl = TimeSpan.FromMinutes(30);
         private static readonly SemaphoreSlim _listLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _itemLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _writeLock = new(1, 1);
 
         private readonly IPermissionRepo _permissionRepo;
         private readonly IRoleRepo _roleRepo;
+        private readonly IUserRepo _userRepo;
         private readonly ICacheService _cacheService;
+        private readonly IUserSessionInvalidationService _sessionInvalidation;
 
         public PermissionService(
             IPermissionRepo permissionRepo,
             IRoleRepo roleRepo,
-            ICacheService cacheService)
+            IUserRepo userRepo,
+            ICacheService cacheService,
+            IUserSessionInvalidationService sessionInvalidation)
         {
             _permissionRepo = permissionRepo;
             _roleRepo = roleRepo;
+            _userRepo = userRepo;
             _cacheService = cacheService;
+            _sessionInvalidation = sessionInvalidation;
         }
 
         public async Task<ApiResponse<PagedResponse<PermissionResponseDto>>> GetAllAsync(PaginationDto pagedto)
@@ -67,118 +75,179 @@ namespace Ecommerce.Application.Services.Implementations
 
         public async Task<ApiResponse<PermissionResponseDto>> GetByIdAsync(int id)
         {
-            var permission = await _permissionRepo.GetByIdAsync(id);
-            if (permission == null) throw new NotFoundException("Permission not found");
+            var cacheKey = CacheKeyGenerator.Permission(id);
 
-            return ApiResponse<PermissionResponseDto>.SuccessResponse(MapToResponseDto(permission));
+            // Check 1: Cache
+            var cached = await _cacheService.GetAsync<PermissionResponseDto>(cacheKey);
+            if (cached != null) return ApiResponse<PermissionResponseDto>.SuccessResponse(cached);
+
+            await _itemLoadLock.WaitAsync();
+            try
+            {
+                // Check 2: Double-check
+                cached = await _cacheService.GetAsync<PermissionResponseDto>(cacheKey);
+                if (cached != null) return ApiResponse<PermissionResponseDto>.SuccessResponse(cached);
+
+                var permission = await _permissionRepo.GetByIdAsync(id);
+                if (permission == null) throw new NotFoundException("Permission not found");
+
+                var dto = MapToResponseDto(permission);
+                await _cacheService.SetAsync(cacheKey, dto, PermissionCacheTtl);
+                return ApiResponse<PermissionResponseDto>.SuccessResponse(dto);
+            }
+            finally { _itemLoadLock.Release(); }
         }
 
         public async Task<ApiResponse<PermissionResponseDto>> CreateAsync(PermissionCreateDto dto)
         {
-            var entity = (dto.Entity ?? string.Empty).Trim().ToLowerInvariant();
-            var action = (dto.Action ?? string.Empty).Trim().ToLowerInvariant();
-
-            if (string.IsNullOrWhiteSpace(entity) || string.IsNullOrWhiteSpace(action))
-                throw new BusinessException("Entity and Action are required.");
-
-            var name = $"{entity}.{action}";
-
-
-            if (await _permissionRepo.ExistsByEntityActionAsync(entity, action))
-                throw new BusinessException("Permission already exists (Entity + Action must be unique).");
-
-            var permission = new Permission
+            await _writeLock.WaitAsync();
+            try
             {
-                Entity = entity,
-                Action = action,
-                Name = name,
-                IsSystem = false,
-                Description = dto.Description?.Trim() ?? string.Empty,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _permissionRepo.AddAsync(permission);
 
-            var adminRole = await _roleRepo.GetByNameRoleAsync("Admin");
-            if (adminRole != null)
-            {
-                var alreadyAssigned = await _permissionRepo.RolePermissionExistsAsync(adminRole.Id, permission.Id);
-                if (!alreadyAssigned)
+                var entity = (dto.Entity ?? string.Empty).Trim().ToLowerInvariant();
+                var action = (dto.Action ?? string.Empty).Trim().ToLowerInvariant();
+
+                if (string.IsNullOrWhiteSpace(entity) || string.IsNullOrWhiteSpace(action))
+                    throw new BusinessException("Entity and Action are required.");
+
+                var name = $"{entity}.{action}";
+
+
+                if (await _permissionRepo.ExistsByEntityActionAsync(entity, action))
+                    throw new BusinessException("Permission already exists (Entity + Action must be unique).");
+           
+                var permission = new Permission
                 {
-                    await _permissionRepo.AddRolePermissionAsync(new RolePermission
+                    Entity = entity,
+                    Action = action,
+                    Name = name,
+                    IsSystem = false,
+                    Description = dto.Description?.Trim() ?? string.Empty,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _permissionRepo.AddAsync(permission);
+                await _permissionRepo.SaveChangesAsync();
+
+                var adminRole = await _roleRepo.GetByNameRoleAsync("Admin");
+                if (adminRole != null)
+                {
+                    var alreadyAssigned = await _permissionRepo.RolePermissionExistsAsync(adminRole.Id, permission.Id);
+                    if (!alreadyAssigned)
                     {
-                        RoleId = adminRole.Id,
-                        PermissionId = permission.Id
-                    });
+                        await _permissionRepo.AddRolePermissionAsync(new RolePermission
+                        {
+                            RoleId = adminRole.Id,
+                            PermissionId = permission.Id
+                        });
+                    }
+
                 }
+
+                await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
+
+                if (adminRole != null)
+                {
+                    var adminUserIds = await _userRepo.GetActiveUserIdsByRoleIdAsync(adminRole.Id);
+                    foreach (var uid in adminUserIds)
+                        await _sessionInvalidation.InvalidateAsync(uid);
+                }
+
+                var item = MapToResponseDto(permission);
+                return ApiResponse<PermissionResponseDto>.SuccessResponse(
+                       item,
+                        "Create data successfully"
+                        );
             }
-
-            await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
-
-            var item = MapToResponseDto(permission);
-            return ApiResponse<PermissionResponseDto>.SuccessResponse(
-                   item,
-                    "Create data successfully"
-                    );
+            finally
+            {
+                _writeLock.Release();
+            }
         }
 
         public async Task<ApiResponse<PermissionResponseDto>> UpdateAsync(int id, PermissionUpdateDto dto)
         {
-            var permission = await _permissionRepo.GetByIdAsync(id);
-            if (permission == null) throw new NotFoundException("Permission not found");
+            await _writeLock.WaitAsync();
+            try
+            {
+                var permission = await _permissionRepo.GetByIdAsync(id);
+                if (permission == null) throw new NotFoundException("Permission not found");
 
-            var entity = (dto.Entity ?? string.Empty).Trim().ToLowerInvariant();
-            var action = (dto.Action ?? string.Empty).Trim().ToLowerInvariant();
+                var entity = (dto.Entity ?? string.Empty).Trim().ToLowerInvariant();
+                var action = (dto.Action ?? string.Empty).Trim().ToLowerInvariant();
 
-            if (string.IsNullOrWhiteSpace(entity) || string.IsNullOrWhiteSpace(action))
-                throw new BusinessException("Entity and Action are required.");
+                if (string.IsNullOrWhiteSpace(entity) || string.IsNullOrWhiteSpace(action))
+                    throw new BusinessException("Entity and Action are required.");
 
-            if (await _permissionRepo.ExistsByEntityActionAsync(entity, action, excludePermissionId: id))
-                throw new BusinessException("Permission already exists (Entity + Action must be unique).");
+                if (await _permissionRepo.ExistsByEntityActionAsync(entity, action, excludePermissionId: id))
+                    throw new BusinessException("Permission already exists (Entity + Action must be unique).");
 
-            permission.Entity = entity;
-            permission.Action = action;
-            permission.Name = $"{entity}.{action}";
-            permission.IsSystem = dto.IsSystem;
-            permission.Description = dto.Description?.Trim() ?? string.Empty;
-            permission.UpdatedAt = DateTime.UtcNow;
+                permission.Entity = entity;
+                permission.Action = action;
+                permission.Name = $"{entity}.{action}";
+                permission.IsSystem = dto.IsSystem;
+                permission.Description = dto.Description?.Trim() ?? string.Empty;
+                permission.UpdatedAt = DateTime.UtcNow;
 
-            await _permissionRepo.UpdateAsync(permission);
+                await _permissionRepo.UpdateAsync(permission);
 
-            await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
+                await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
 
-            var item = MapToResponseDto(permission);
-            return ApiResponse<PermissionResponseDto>.SuccessResponse(
-                   item,
-                   "Update data successfully"
-                   );
+
+                var usersWithPerm = await _userRepo.GetActiveUserIdsHavingPermissionAsync(id);
+                foreach (var uid in usersWithPerm)
+                    await _sessionInvalidation.InvalidateAsync(uid);
+
+                var item = MapToResponseDto(permission);
+                return ApiResponse<PermissionResponseDto>.SuccessResponse(
+                       item,
+                       "Update data successfully"
+                       );
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
         }
 
         public async Task<ApiResponse<PermissionResponseDto>> DeleteAsync(int id)
         {
-            var permission = await _permissionRepo.GetByIdAsync(id);
+            await _writeLock.WaitAsync();
+            try
+            {
+                var permission = await _permissionRepo.GetByIdAsync(id);
 
-            if (permission == null) throw new NotFoundException("Permission not found");
+                if (permission == null) throw new NotFoundException("Permission not found");
 
 
-            if (permission.IsSystem)
-                throw new BusinessException("Do not delete system permission");
+                if (permission.IsSystem)
+                    throw new BusinessException("Do not delete system permission");
 
-            if (await _permissionRepo.IsAssignedToAnyNonAdminRoleAsync(permission.Id))
-                throw new BusinessException("Permission is assigned by role user. Please remove permissions before deleting");
+                if (await _permissionRepo.IsAssignedToAnyNonAdminRoleAsync(permission.Id))
+                    throw new BusinessException("Permission is assigned by role user. Please remove permissions before deleting");
 
-            permission.IsDeleted = true;
+                var usersWithPerm = await _userRepo.GetActiveUserIdsHavingPermissionAsync(permission.Id);
 
-            await _permissionRepo.SaveChangesAsync();
+                permission.IsDeleted = true;
 
-            await _permissionRepo.HardDeleteRolePermissionsByPermissionIdAsync(permission.Id);
+                await _permissionRepo.SaveChangesAsync();
 
-            await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
+                await _permissionRepo.HardDeleteRolePermissionsByPermissionIdAsync(permission.Id);
 
-            var item = MapToResponseDto(permission);
-            return ApiResponse<PermissionResponseDto>.SuccessResponse(
-                     item,
-                    "Delete data successfully"
-            );
+                await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
+
+                foreach (var uid in usersWithPerm)
+                    await _sessionInvalidation.InvalidateAsync(uid);
+
+                var item = MapToResponseDto(permission);
+                return ApiResponse<PermissionResponseDto>.SuccessResponse(
+                         item,
+                        "Delete data successfully"
+                );
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
         }
         private PermissionResponseDto MapToResponseDto(Permission p) => new PermissionResponseDto
         {

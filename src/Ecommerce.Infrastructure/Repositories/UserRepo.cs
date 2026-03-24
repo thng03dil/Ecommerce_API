@@ -96,6 +96,26 @@ namespace Ecommerce.Infrastructure.Repositories
             return ids;
         }
 
+        public async Task<IReadOnlyList<int>> GetActiveUserIdsByRoleIdAsync(int roleId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.RoleId == roleId && !u.IsDeleted)
+                .Select(u => u.Id)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<int>> GetActiveUserIdsHavingPermissionAsync(int permissionId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => !u.IsDeleted &&
+                    _context.RolePermissions.Any(rp => rp.RoleId == u.RoleId && rp.PermissionId == permissionId))
+                .Select(u => u.Id)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task AddAsync(User user)
         {
             await _context.Users.AddAsync(user);

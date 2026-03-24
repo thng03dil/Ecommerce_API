@@ -1,9 +1,11 @@
-using Ecommerce.Application.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using Ecommerce.Application.Common.Responses;
 using Ecommerce.Application.DTOs.Auth;
 using Ecommerce.Application.DTOs.Common;
 using Ecommerce.Application.Extensions;
+using Ecommerce.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers
 {
@@ -55,12 +57,19 @@ namespace Ecommerce.API.Controllers
         public async Task<IActionResult> Logout()
         {
             var userId = User.GetUserId();
-            var authHeader = Request.Headers["Authorization"].ToString();
-            var accessToken = authHeader.Replace("Bearer ", "").Trim();
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
 
             if (string.IsNullOrEmpty(accessToken))
             {
-                return BadRequest(new { message = "Invalid token" });
+                string? authHeader = Request.Headers["Authorization"];
+                if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    accessToken = authHeader["Bearer ".Length..].Trim();
+                }
+            }
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse("Access token is missing"));
             }
 
             await _authService.LogoutAsync(userId, accessToken);

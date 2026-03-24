@@ -19,7 +19,7 @@ namespace Ecommerce.Infrastructure.RedisCaching
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
-        public int DefaultExpirationMinutes { get; set; } = 5;
+        public int DefaultExpirationMinutes { get; set; } = 10;
     }
 
     public class RedisCacheService : ICacheService

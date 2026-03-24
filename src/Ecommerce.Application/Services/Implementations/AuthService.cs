@@ -8,7 +8,6 @@ using Ecommerce.Domain.Common.Settings;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
 using Microsoft.Extensions.Options;
-using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
@@ -19,8 +18,6 @@ namespace Ecommerce.Application.Services.Implementations
     {
         private const int MaxLoginFailures = 5;
         private static readonly TimeSpan LoginFailureWindow = TimeSpan.FromMinutes(15);
-
-        private static readonly ConcurrentDictionary<int, SemaphoreSlim> _userAuthLocks = new();
 
         private readonly IUserRepo _userRepo;
         private readonly IRoleRepo _roleRepo;
@@ -33,6 +30,7 @@ namespace Ecommerce.Application.Services.Implementations
         private readonly ISecurityFingerprintHelper _fingerprint;
         private readonly ISessionValidationService _sessionValidation;
         private readonly ITokenBlacklistService _tokenBlacklist;
+        private readonly IUserSessionInvalidationService _sessionInvalidation;
 
         public AuthService(
             IUserRepo userRepo,
@@ -45,7 +43,8 @@ namespace Ecommerce.Application.Services.Implementations
             IDeviceService deviceService,
             ISecurityFingerprintHelper fingerprint,
             ISessionValidationService sessionValidation,
-            ITokenBlacklistService tokenBlacklist)
+            ITokenBlacklistService tokenBlacklist,
+            IUserSessionInvalidationService sessionInvalidation)
         {
             _userRepo = userRepo;
             _roleRepo = roleRepo;
@@ -58,10 +57,8 @@ namespace Ecommerce.Application.Services.Implementations
             _fingerprint = fingerprint;
             _sessionValidation = sessionValidation;
             _tokenBlacklist = tokenBlacklist;
+            _sessionInvalidation = sessionInvalidation;
         }
-
-        private static SemaphoreSlim GetUserAuthLock(int userId) =>
-            _userAuthLocks.GetOrAdd(userId, _ => new SemaphoreSlim(1, 1));
 
         public async Task RegisterAsync(RegisterDto request)
         {
@@ -87,6 +84,10 @@ namespace Ecommerce.Application.Services.Implementations
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto request)
         {
+            var deviceId = _deviceService.GetDeviceId();
+            if (string.IsNullOrWhiteSpace(deviceId))
+                throw new UnauthorizedException("X-Device-Id header is required for login");
+
             var emailKey = request.Email.Trim().ToLowerInvariant();// dựa trên nguyên tắc ngôn ngữ trung lập (văn hóa bất biến - Invariant Culture)
             var failKey = CacheKeyGenerator.LoginFailure(emailKey);
 
@@ -99,18 +100,15 @@ namespace Ecommerce.Application.Services.Implementations
                 failCount++;
                 await _cacheService.SetAsync(failKey, failCount, LoginFailureWindow);
                 if (failCount > MaxLoginFailures)
-                    throw new TooManyRequestsException();
+                    throw new TooManyRequestsException("Too many login attempts. Try again later.");
 
                 throw new UnauthorizedException("Invalid email or password");
             }
 
             await _cacheService.RemoveAsync(failKey);
 
-            var deviceId = _deviceService.GetDeviceId();
-            if (string.IsNullOrWhiteSpace(deviceId))
-                throw new UnauthorizedException("X-Device-Id header is required for login");
-
-            var authLock = GetUserAuthLock(userForCred.Id);
+            
+            var authLock = UserAuthLockRegistry.GetLock(userForCred.Id);
             await authLock.WaitAsync();
             try
             {
@@ -171,7 +169,7 @@ namespace Ecommerce.Application.Services.Implementations
             if (!Guid.TryParse(sid, out var sessionId))
                 throw new UnauthorizedException("Invalid token");
 
-            var authLock = GetUserAuthLock(userId);
+            var authLock = UserAuthLockRegistry.GetLock(userId);
             await authLock.WaitAsync();
             try
             {
@@ -184,7 +182,7 @@ namespace Ecommerce.Application.Services.Implementations
                 // check token reuse detected
                 if (storedRt.IsRevoked)
                 {
-                    await InvalidateAllUserSessionsAsync(userId);
+                    await _sessionInvalidation.InvalidateAsync(userId);
                     throw new UnauthorizedException("Refresh token reuse detected");
                 }
                 // check invalid info from token
@@ -230,7 +228,7 @@ namespace Ecommerce.Application.Services.Implementations
 
         public async Task LogoutAsync(int userId, string accessToken)
         {
-            if (!string.IsNullOrEmpty(accessToken))
+            if (!string.IsNullOrEmpty(accessToken)) 
             {
                 try
                 {
@@ -248,30 +246,8 @@ namespace Ecommerce.Application.Services.Implementations
                     // ignore malformed token on logout
                 }
             }
-
-            var authLock = GetUserAuthLock(userId);
-            await authLock.WaitAsync();
-            try
-            {
-                await _refreshTokenRepo.RevokeAllForUserAsync(userId);
-
-                var user = await _userRepo.GetByIdForUpdateAsync(userId);
-                if (user == null)
-                    return;
-
-                var oldSessionVersion = user.SessionVersion;
-                user.SessionVersion += 1;
-                user.CurrentSessionId = null;
-                user.LastLoginIpHash = null;
-                user.LastDeviceId = null;
-
-                await _userRepo.SaveChangesAsync();
-                await _cacheService.RemoveAsync(CacheKeyGenerator.AuthSession(userId, oldSessionVersion));
-            }
-            finally
-            {
-                authLock.Release();
-            }
+            await _refreshTokenRepo.RevokeAllForUserAsync(userId);
+            await _sessionInvalidation.InvalidateAsync(userId);
         }
 
         public async Task<bool> HasPermissionAsync(int userId, string permission)
@@ -329,26 +305,6 @@ namespace Ecommerce.Application.Services.Implementations
                 CacheKeyGenerator.AuthSession(userId, sessionVersion),
                 state,
                 TimeSpan.FromDays(_jwtSettings.RefreshTokenDays));
-        }
-        //hủy toàn bộ token đang còn hiệu lực của user và tăng session version
-        //để tất cả access token cũ đều bị vô hiệu hóa,
-        //đồng thời xóa cache session nếu có
-        private async Task InvalidateAllUserSessionsAsync(int userId)
-        {
-            await _refreshTokenRepo.RevokeAllForUserAsync(userId);
-
-            var user = await _userRepo.GetByIdForUpdateAsync(userId);
-            if (user == null)
-                return;
-
-            var oldSessionVersion = user.SessionVersion;
-            user.SessionVersion += 1;
-            user.CurrentSessionId = null;
-            user.LastLoginIpHash = null;
-            user.LastDeviceId = null;
-
-            await _userRepo.SaveChangesAsync();
-            await _cacheService.RemoveAsync(CacheKeyGenerator.AuthSession(userId, oldSessionVersion));
         }
         // tạo RefreshToken, lưu DB, lưu Cache và trả về DTO
         private async Task<AuthResponseDto> IssueAuthResponseAsync(

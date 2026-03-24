@@ -30,6 +30,7 @@ namespace Ecommerce.Application.Common.Caching
         public static string RoleList(string version, int page, int size) =>
             $"role:list:v{version}:{page}:{size}";
 
+        public static string Permission(int id) => $"permission:{id}";
         public static string PermissionVersionKey() => "permission:version";
         public static string PermissionList(string version, int page, int size) =>
             $"permission:list:v{version}:{page}:{size}";

@@ -16,25 +16,30 @@ namespace Ecommerce.Application.Services.Implementations
         private const string DefaultUserRoleName = "User";
         private static readonly TimeSpan RoleCacheTtl = TimeSpan.FromMinutes(30);
         private static readonly SemaphoreSlim _listLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _itemLoadLock = new(1, 1);
+        private static readonly SemaphoreSlim _writeLock = new(1, 1);
 
         private readonly IRoleRepo _roleRepo;
         private readonly IPermissionRepo _permissionRepo;
         private readonly IUserRepo _userRepo;
         private readonly ICacheService _cacheService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserSessionInvalidationService _sessionInvalidation;
 
         public RoleService(
             IRoleRepo roleRepo,
             IPermissionRepo permissionRepo,
             IUserRepo userRepo,
             ICacheService cacheService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IUserSessionInvalidationService sessionInvalidation)
         {
             _roleRepo = roleRepo;
             _permissionRepo = permissionRepo;
             _userRepo = userRepo;
             _cacheService = cacheService;
             _unitOfWork = unitOfWork;
+            _sessionInvalidation = sessionInvalidation;
         }
 
         public async Task<ApiResponse<PagedResponse<RoleResponseDto>>> GetAllAsync(PaginationDto pagedto)
@@ -72,13 +77,21 @@ namespace Ecommerce.Application.Services.Implementations
         public async Task<ApiResponse<RoleWithPermissionsDto>> GetByIdAsync(int id)
         {
             var cacheKey = CacheKeyGenerator.Role(id);
+            // check 1
+            var cachedDto = await _cacheService.GetAsync<RoleWithPermissionsDto>(cacheKey);
+            if (cachedDto != null) return ApiResponse<RoleWithPermissionsDto>.SuccessResponse(cachedDto);
 
-            var dto = await _cacheService.GetOrSetAsync(cacheKey, async () =>
+            await _itemLoadLock.WaitAsync();
+            try
             {
-                var role = await _roleRepo.GetByIdWithPermissionsAsync(id);
-                if (role == null) return null;
+                // Double-check
+                cachedDto = await _cacheService.GetAsync<RoleWithPermissionsDto>(cacheKey);
+                if (cachedDto != null) return ApiResponse<RoleWithPermissionsDto>.SuccessResponse(cachedDto);
 
-                return new RoleWithPermissionsDto
+                var role = await _roleRepo.GetByIdWithPermissionsAsync(id);
+                if (role == null) throw new NotFoundException("Role not found");
+
+                var dto = new RoleWithPermissionsDto
                 {
                     Id = role.Id,
                     Name = role.Name,
@@ -92,115 +105,142 @@ namespace Ecommerce.Application.Services.Implementations
                             Entity = rp.Permission.Entity,
                             Action = rp.Permission.Action,
                             Description = rp.Permission.Description
-                        })
-                        .ToList()
+                        }).ToList()
                 };
-            }, RoleCacheTtl);
 
-            if (dto == null)
-                throw new NotFoundException("Role not found");
+                await _cacheService.SetAsync(cacheKey, dto, RoleCacheTtl);
 
-            return ApiResponse<RoleWithPermissionsDto>.SuccessResponse(dto);
+                return ApiResponse<RoleWithPermissionsDto>.SuccessResponse(dto);
+            }
+            finally
+            {
+                _itemLoadLock.Release();
+            }
         }
 
         public async Task<ApiResponse<RoleResponseDto>> CreateAsync(RoleCreateDto dto)
         {
-            if (await _roleRepo.ExistsByNameAsync(dto.Name))
+            await _writeLock.WaitAsync();
+            try
+            {
+                if (await _roleRepo.ExistsByNameAsync(dto.Name))
                 throw new BusinessException("Role name already exists");
 
-            if (dto.PermissionIds != null && dto.PermissionIds.Any())
+                if (dto.PermissionIds != null && dto.PermissionIds.Any())
+                {
+                    var allExist = await _permissionRepo.AllIdsExistAsync(dto.PermissionIds);
+                    if (!allExist)
+                    {
+                        throw new BusinessException("One or more Permission IDs do not exist.");
+                    }
+                }
+                var role = new Role
+                {
+                    Name = dto.Name,
+                    Description = dto.Description,
+                    IsSystem = false,
+                    RolePermissions = dto.PermissionIds?
+                        .Distinct()
+                        .Select(pId => new RolePermission
+                        {
+                            PermissionId = pId
+                        }).ToList() ?? new List<RolePermission>()
+                };
+
+                await _roleRepo.AddAsync(role);
+                await _roleRepo.SaveChangesAsync();
+
+                var createdRole = await _roleRepo.GetByIdWithPermissionsAsync(role.Id);
+                if (createdRole == null)
+                {
+                    throw new Exception("Role just created but not found");
+                }
+
+                await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
+                if (dto.PermissionIds != null && dto.PermissionIds.Any())
+                    await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
+
+                return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(createdRole), "Created successfully");
+
+            }
+            finally { _writeLock.Release(); }
+        }
+        public async Task<ApiResponse<RoleResponseDto>> UpdateAsync(int id, RoleUpdateDto dto)
+        {
+            await _writeLock.WaitAsync();
+            try
             {
+                var role = await _roleRepo.GetByIdAsync(id);
+                if (role == null) throw new NotFoundException("Role not found");
+
+                if (!role.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (await _roleRepo.ExistsByNameAsync(dto.Name))
+                        throw new BusinessException("New role name already exists");
+                }
+
+                role.Name = dto.Name;
+                role.Description = dto.Description;
+                role.UpdatedAt = DateTime.UtcNow;
+
+                await _roleRepo.UpdateAsync(role);
+
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Role(id));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
+
+                var updatedRole = await _roleRepo.GetByIdWithPermissionsAsync(id);
+
+                if (updatedRole == null)
+                    throw new NotFoundException("Role not found after update");
+
+                return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(updatedRole), "Updated successfully");
+            }
+            finally {
+                _writeLock.Release(); 
+            }
+        }
+        public async Task<ApiResponse<bool>> AssignPermissionsAsync(AssignPermissionsDto dto)
+        {
+            await _writeLock.WaitAsync();
+            try
+            {
+                var role = await _roleRepo.GetByIdWithPermissionsAsync(dto.RoleId);
+                if (role == null) throw new NotFoundException("Role not found");
+
                 var allExist = await _permissionRepo.AllIdsExistAsync(dto.PermissionIds);
                 if (!allExist)
                 {
                     throw new BusinessException("One or more Permission IDs do not exist.");
                 }
-            }
-            var role = new Role
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                IsSystem = false,
-                RolePermissions = dto.PermissionIds?
-                    .Distinct()
-                    .Select(pId => new RolePermission
+
+                role.RolePermissions.Clear();
+
+                var uniquePermissionIds = dto.PermissionIds.Distinct();
+
+                foreach (var pId in uniquePermissionIds)
+                {
+                    role.RolePermissions.Add(new RolePermission
                     {
+                        RoleId = dto.RoleId,
                         PermissionId = pId
-                    }).ToList() ?? new List<RolePermission>()
-            };
+                    });
+                }
 
-            await _roleRepo.AddAsync(role);
+                await _roleRepo.UpdateAsync(role);
 
-            var createdRole = await _roleRepo.GetByIdWithPermissionsAsync(role.Id);
-            if (createdRole == null)
-            {
-                throw new Exception("Role just created but not found");
-            }
-
-            await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
-            if (dto.PermissionIds != null && dto.PermissionIds.Any())
+                await _cacheService.RemoveAsync(CacheKeyGenerator.Role(dto.RoleId));
+                await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
                 await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
 
-            return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(createdRole), "Created successfully");
-        }
-        public async Task<ApiResponse<RoleResponseDto>> UpdateAsync(int id, RoleUpdateDto dto)
-        {
-            var role = await _roleRepo.GetByIdAsync(id);
-            if (role == null) throw new NotFoundException("Role not found");
+                var userIdsOnRole = await _userRepo.GetActiveUserIdsByRoleIdAsync(dto.RoleId);
+                foreach (var uid in userIdsOnRole)
+                    await _sessionInvalidation.InvalidateAsync(uid);
 
-            if (!role.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                if (await _roleRepo.ExistsByNameAsync(dto.Name))
-                    throw new BusinessException("New role name already exists");
+                return ApiResponse<bool>.SuccessResponse(true, "Permissions assigned successfully");
             }
-
-            role.Name = dto.Name;
-            role.Description = dto.Description;
-            role.UpdatedAt = DateTime.UtcNow;
-
-            await _roleRepo.UpdateAsync(role);
-
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Role(id));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
-
-            var updatedRole = await _roleRepo.GetByIdWithPermissionsAsync(id);
-
-            if (updatedRole == null)
-                throw new NotFoundException("Role not found after update");
-
-            return ApiResponse<RoleResponseDto>.SuccessResponse(MapToResponseDto(updatedRole), "Updated successfully");
-        }
-        public async Task<ApiResponse<bool>> AssignPermissionsAsync(AssignPermissionsDto dto)
-        {
-            var role = await _roleRepo.GetByIdWithPermissionsAsync(dto.RoleId);
-            if (role == null) throw new NotFoundException("Role not found");
-
-            var allExist = await _permissionRepo.AllIdsExistAsync(dto.PermissionIds);
-            if (!allExist)
-            {
-                throw new BusinessException("One or more Permission IDs do not exist.");
+            finally { 
+                _writeLock.Release(); 
             }
-
-            role.RolePermissions.Clear();
-
-            var uniquePermissionIds = dto.PermissionIds.Distinct();
-
-            foreach (var pId in uniquePermissionIds)
-            {
-                role.RolePermissions.Add(new RolePermission
-                {
-                    RoleId = dto.RoleId,
-                    PermissionId = pId
-                });
-            }
-
-            await _roleRepo.UpdateAsync(role);
-
-            await _cacheService.RemoveAsync(CacheKeyGenerator.Role(dto.RoleId));
-            await _cacheService.IncrementAsync(CacheKeyGenerator.RoleVersionKey());
-            await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
-
-            return ApiResponse<bool>.SuccessResponse(true, "Permissions assigned successfully");
         }
         public async Task<ApiResponse<bool>> DeleteAsync(int id)
         {
@@ -230,7 +270,10 @@ namespace Ecommerce.Application.Services.Implementations
             await _cacheService.IncrementAsync(CacheKeyGenerator.PermissionVersionKey());
 
             foreach (var userId in affectedUserIds)
+            {
+                await _sessionInvalidation.InvalidateAsync(userId);
                 await _cacheService.RemoveAsync(CacheKeyGenerator.User(userId));
+            }
 
             return ApiResponse<bool>.SuccessResponse(true, "Role deleted successfully");
         }

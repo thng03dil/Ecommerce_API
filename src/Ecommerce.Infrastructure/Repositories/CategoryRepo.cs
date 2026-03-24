@@ -22,7 +22,7 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             var query = _context.Categories
                 .AsNoTracking()
-                .Include(c => c.Products)
+                .Include(c => c.Products.Where(p => !p.IsDeleted))
                 .Where(x => !x.IsDeleted)
                 .ApplySearch(filter.Keyword, c => c.Name)
                 .ApplySearch(filter.Slug, c => c.Slug)
@@ -32,6 +32,16 @@ namespace Ecommerce.Infrastructure.Repositories
 
             var items = await query
                 .ApplyPagination(pagination.PageNumber, pagination.PageSize)
+                .Select(c => new Category
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Slug = c.Slug,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt,
+                    Products = _context.Products.Where(p => p.CategoryId == c.Id && !p.IsDeleted).ToList()
+                })
                 .ToListAsync();
 
             return (items, total);
@@ -44,10 +54,9 @@ namespace Ecommerce.Infrastructure.Repositories
                     .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
         
-        public async Task CreateAsync(Category category) {
+        public async Task AddAsync(Category category) {
             
                await _context.Categories.AddAsync(category);
-             await _context.SaveChangesAsync();
         }
 
         public async Task<Category?> GetByIdForUpdateAsync(int id)

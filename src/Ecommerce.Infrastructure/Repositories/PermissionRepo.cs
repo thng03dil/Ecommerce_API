@@ -92,7 +92,6 @@ namespace Ecommerce.Infrastructure.Repositories
         public async Task AddAsync(Permission permission)
         {
             await _context.Permissions.AddAsync(permission);
-            await _context.SaveChangesAsync();
         }
         public async Task UpdateAsync(Permission permission)
         {

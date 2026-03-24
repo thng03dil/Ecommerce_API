@@ -12,5 +12,6 @@ namespace Ecommerce.Domain.Interfaces
         Task<Role?> GetByNameRoleAsync(string nameRole);
         Task AddAsync(Role role);
         Task UpdateAsync(Role role);
+        Task SaveChangesAsync();
     }
 }
