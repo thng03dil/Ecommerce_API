@@ -320,7 +320,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task RefreshTokenAsync_Valid_ShouldReturnNewTokens()
+    public async Task RefreshTokenAsync_Valid_ShouldReturnNewAccessTokenAndSameRefreshTokenWithoutRotation()
     {
         // Arrange
         var userId = 70310;
@@ -346,8 +346,6 @@ public class AuthServiceTests
         _refreshTokenRepo.Setup(x => x.GetByTokenHashAnyAsync("rt-h")).ReturnsAsync(stored);
         var user = TestDataMother.CreateUser(userId, sessionVersion: 4);
         _userRepo.Setup(x => x.GetByIdForUpdateAsync(userId)).ReturnsAsync(user);
-        _jwtService.Setup(x => x.GenerateRefreshToken()).Returns("new-rt");
-        _jwtService.Setup(x => x.HashToken("new-rt")).Returns("new-rt-h");
         _jwtService
             .Setup(x => x.GenerateAccessToken(It.IsAny<User>(), sid, 4, "fp"))
             .Returns("new-access");
@@ -359,9 +357,9 @@ public class AuthServiceTests
 
         // Assert
         result.AccessToken.Should().Be("new-access");
-        result.RefreshToken.Should().Be("new-rt");
-        _refreshTokenRepo.Verify(x => x.RevokeByIdAsync(900), Times.Once);
-        _refreshTokenRepo.Verify(x => x.AddAsync(It.IsAny<RefreshToken>()), Times.Once);
+        result.RefreshToken.Should().Be("old-rt");
+        _refreshTokenRepo.Verify(x => x.RevokeByIdAsync(It.IsAny<int>()), Times.Never);
+        _refreshTokenRepo.Verify(x => x.AddAsync(It.IsAny<RefreshToken>()), Times.Never);
         _userRepo.Verify(x => x.SaveChangesAsync(), Times.Once);
         _cacheService.Verify(
             x => x.RemoveByPrefixAsync(CacheKeyGenerator.AuthSessionUserPrefix(userId)),

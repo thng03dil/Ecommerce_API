@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Domain.Common.Filters
+namespace Ecommerce.Domain.Common.Filters
 {
     public class CategoryFilterDto
     {

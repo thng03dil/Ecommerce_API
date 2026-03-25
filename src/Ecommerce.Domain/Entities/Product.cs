@@ -12,7 +12,6 @@ namespace Ecommerce.Domain.Entities
         public decimal Price { get; set; }
 
         public int Stock { get; set; }
-        public string? slugs { get; set; }
 
         public int CategoryId { get; set; }
 

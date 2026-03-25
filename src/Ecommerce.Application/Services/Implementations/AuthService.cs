@@ -86,7 +86,6 @@ namespace Ecommerce.Application.Services.Implementations
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto request)
         {
-            await _cacheService.SetAsync("debug:connection", "connected_from_dotnet", TimeSpan.FromMinutes(10));
             var deviceId = _deviceService.GetDeviceId();
             if (string.IsNullOrWhiteSpace(deviceId))
                 throw new UnauthorizedException("X-Device-Id header is required for login");
@@ -182,7 +181,7 @@ namespace Ecommerce.Application.Services.Implementations
                 if (storedRt == null)
                     throw new UnauthorizedException("Invalid refresh token");
 
-                // check token reuse detected
+                // RT đã bị revoke (logout, login lại, invalidate…) — không phải lần dùng thứ hai sau refresh thành công.
                 if (storedRt.IsRevoked)
                 {
                     await _sessionInvalidation.InvalidateAsync(userId);
@@ -203,8 +202,6 @@ namespace Ecommerce.Application.Services.Implementations
                         await _tokenBlacklist.BlacklistAsync(_jwtService.HashToken(jti), remaining.Value);
                 }
 
-                await _refreshTokenRepo.RevokeByIdAsync(storedRt.Id);
-
                 var user = await _userRepo.GetByIdForUpdateAsync(userId);
                 if (user == null)
                     throw new NotFoundException("User not found");
@@ -213,13 +210,12 @@ namespace Ecommerce.Application.Services.Implementations
                 user.LastDeviceId = deviceId ?? string.Empty;
                 user.LastFingerprintHash = currentFingerprint;
 
-                return await IssueAuthResponseAsync(
+                return await IssueAccessTokenOnlyAsync(
                     user,
                     sessionId,
-                    storedRt.FamilyId,
                     deviceId ?? string.Empty,
-                    currentFingerprint
-                    );
+                    currentFingerprint,
+                    request.RefreshToken);
             }
             finally
             {
@@ -307,7 +303,43 @@ namespace Ecommerce.Application.Services.Implementations
                 state,
                 TimeSpan.FromDays(_jwtSettings.RefreshTokenDays));
         }
-        // tạo RefreshToken, lưu DB, lưu Cache và trả về DTO
+        /// <summary>
+        /// Sau khi refresh hợp lệ: chỉ phát access token mới, giữ nguyên refresh token (không rotate, không revoke bản ghi RT).
+        /// Client tiếp tục lưu và gửi cùng refresh token cho tới khi hết hạn hoặc logout.
+        /// </summary>
+        private async Task<AuthResponseDto> IssueAccessTokenOnlyAsync(
+            User user,
+            Guid sessionId,
+            string deviceId,
+            string fingerprintHash,
+            string refreshTokenPlainUnchanged)
+        {
+            await _userRepo.SaveChangesAsync();
+
+            await _cacheService.RemoveByPrefixAsync(CacheKeyGenerator.AuthSessionUserPrefix(user.Id));
+
+            var accessToken = _jwtService.GenerateAccessToken(
+                user,
+                sessionId,
+                user.SessionVersion,
+                fingerprintHash);
+
+            await CacheSessionAsync(
+                user.Id,
+                sessionId,
+                user.SessionVersion,
+                fingerprintHash,
+                deviceId);
+
+            return new AuthResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenPlainUnchanged,
+                ExpiresIn = _jwtSettings.ExpiryMinutes * 60
+            };
+        }
+
+        // tạo RefreshToken, lưu DB, lưu Cache và trả về DTO (login)
         private async Task<AuthResponseDto> IssueAuthResponseAsync(
                      User user,
                      Guid sessionId,

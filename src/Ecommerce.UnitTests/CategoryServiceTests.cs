@@ -78,7 +78,7 @@ public class CategoryServiceTests
     [Fact]
     public async Task GetByIdAsync_WhenCacheHits_ShouldNotQueryDatabase()
     {
-        var dto = new CategoryResponseDto { Id = 3, Name = "Cached", Slug = "c" };
+        var dto = new CategoryResponseDto { Id = 3, Name = "Cached" };
         _cacheService.Setup(x => x.GetAsync<CategoryResponseDto>(It.IsAny<string>())).ReturnsAsync(dto);
 
         var result = await _sut.GetByIdAsync(3);

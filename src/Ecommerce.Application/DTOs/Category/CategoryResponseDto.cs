@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Application.DTOs.CategoryDtos
+namespace Ecommerce.Application.DTOs.CategoryDtos
 {
     public class CategoryResponseDto
     {
