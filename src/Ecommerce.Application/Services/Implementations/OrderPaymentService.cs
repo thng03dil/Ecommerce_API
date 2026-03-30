@@ -129,14 +129,10 @@ public class OrderPaymentService : IOrderPaymentService
     {
         var c = currency.Trim().ToLowerInvariant();
 
-        if (c == "usd")
-            return (long)decimal.Round(price, 0, MidpointRounding.AwayFromZero);
-
-        if (c == "usd")
-            return (long)decimal.Round(price * 100m, 0, MidpointRounding.AwayFromZero);
-
         if (IsZeroDecimalCurrency(c))
+        {
             return (long)decimal.Round(price, 0, MidpointRounding.AwayFromZero);
+        }
 
         return (long)decimal.Round(price * 100m, 0, MidpointRounding.AwayFromZero);
     }

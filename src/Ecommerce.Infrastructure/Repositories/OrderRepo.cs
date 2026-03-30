@@ -222,15 +222,43 @@ public class OrderRepo : IOrderRepo
         return await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
     }
 
-    public async Task<bool> TryUpdateStatusAsync(int orderId, OrderStatus newStatus, CancellationToken cancellationToken = default)
+   public async Task<bool> TryUpdateStatusAsync(int orderId, OrderStatus newStatus, CancellationToken cancellationToken = default)
     {
-        var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
-        if (order == null)
-            return false;
+        await using var tx = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
 
-        order.Status = newStatus;
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+            if (order == null || order.Status == newStatus) return false;
+
+            //nếu đã hủy thì không thể chuyển sang status khác
+            if (order.Status == OrderStatus.Cancelled) return false;
+
+            // NẾU CHUYỂN SANG CANCELLED: Hoàn kho
+            if (newStatus == OrderStatus.Cancelled && order.Status != OrderStatus.Cancelled)
+            {
+                await RevertStockAsync(order.OrderItems, cancellationToken);
+            }
+            
+            // NẾU CHUYỂN SANG PAID: Đồng bộ PaymentStatus
+            if (newStatus == OrderStatus.Paid)
+            {
+                order.PaymentStatus = PaymentStatus.Succeeded;
+                order.PaidAt ??= DateTime.UtcNow;
+            }
+
+            order.Status = newStatus;
+            await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+            return true;
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     public async Task<OrderCancelResult> TryCancelPendingOrderForUserAsync(
@@ -257,14 +285,7 @@ public class OrderRepo : IOrderRepo
                 return OrderCancelResult.Fail(OrderCancelFailure.NotCancellable);
             }
 
-            foreach (var item in order.OrderItems)
-            {
-                await _context.Products
-                    .Where(p => p.Id == item.ProductId)
-                    .ExecuteUpdateAsync(
-                        s => s.SetProperty(p => p.Stock, p => p.Stock + item.Quantity),
-                        cancellationToken);
-            }
+            await RevertStockAsync(order.OrderItems, cancellationToken);
 
             order.Status = OrderStatus.Cancelled;
             await _context.SaveChangesAsync(cancellationToken);
@@ -283,5 +304,15 @@ public class OrderRepo : IOrderRepo
             await tx.RollbackAsync(cancellationToken);
             throw;
         }
+    }
+        private async Task RevertStockAsync(IEnumerable<OrderItem> items, CancellationToken ct)
+    {
+        foreach (var item in items)
+        {
+            await _context.Products
+                .Where(p => p.Id == item.ProductId)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.Stock, p => p.Stock + item.Quantity), ct);
+        }
+    
     }
 }

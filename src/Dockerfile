@@ -1,5 +1,5 @@
 # BƯỚC 1: Sử dụng SDK để Build code
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy các file .csproj để Restore trước (tối ưu tốc độ build)
@@ -23,7 +23,7 @@ FROM build AS publish
 RUN dotnet publish "Ecommerce.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # BƯỚC 3: Chạy ứng dụng (Runtime)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
