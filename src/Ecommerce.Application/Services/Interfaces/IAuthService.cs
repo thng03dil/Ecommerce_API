@@ -20,5 +20,6 @@ namespace Ecommerce.Application.Services.Interfaces
         Task<UserMeResponseDto> GetMeAsync(int userId);
 
         Task LogoutAsync(int userId, string accessToken);
+        Task ChangePasswordAsync(int userId, ChangePasswordRequest request);
     }
 }  

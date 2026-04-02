@@ -273,6 +273,8 @@ namespace Ecommerce.Application.Services.Implementations
             await _sessionInvalidation.InvalidateAsync(userId);
         }
 
+        
+
         public async Task<bool> HasPermissionAsync(int userId, string permission)
         {
             if (userId <= 0) return false;
@@ -287,6 +289,48 @@ namespace Ecommerce.Application.Services.Implementations
             return await _rolePermissionService.RoleHasPermissionAsync(ctx.Value.RoleId, permission);
         }
 
+       public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
+        {
+            // 1. Kiểm tra UserId hợp lệ
+            if (userId <= 0) throw new UnauthorizedException("User not authenticated.");
+
+            // 2. Chạy trong Transaction để đảm bảo an toàn dữ liệu
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                // Sử dụng GetByIdForUpdateAsync để Lock record tránh xung đột dữ liệu
+                var user = await _userRepo.GetByIdForUpdateAsync(userId);
+                if (user == null) throw new NotFoundException("User not found.");
+
+                // 3. Kiểm tra mật khẩu hiện tại bằng IPasswordHasher của bạn
+                if (!_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
+                {
+                    throw new BadRequestException("Current password is incorrect.");
+                }
+
+                // 4. Kiểm tra mật khẩu mới không được trùng mật khẩu cũ
+                if (request.CurrentPassword == request.NewPassword)
+                {
+                    throw new BadRequestException("New password cannot be the same as the current password.");
+                }
+
+                // 5. Cập nhật mật khẩu mới và tăng SessionVersion
+                // Việc tăng SessionVersion sẽ vô hiệu hóa Access Token cũ nếu Middleware có check
+                user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
+                user.SessionVersion += 1; 
+                user.UpdatedAt = DateTime.UtcNow;
+
+                // 6. Xóa các thông tin Refresh Token cũ để buộc đăng nhập lại hoàn toàn
+                user.RefreshTokenHash = null;
+                user.RefreshTokenExpiresAtUtc = null;
+
+                await _userRepo.UpdateAsync(user);
+
+                // 7. Clear Cache session cũ (giống như logic trong Logout)
+                await _cacheService.RemoveAsync(CacheKeyGenerator.AuthSession(userId));
+                
+                return true;
+            });
+        }
         public async Task<UserMeResponseDto> GetMeAsync(int userId)
         {
             if (userId <= 0) throw new UnauthorizedException("Unauthorized");

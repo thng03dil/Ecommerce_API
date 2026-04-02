@@ -29,6 +29,15 @@ namespace Ecommerce.API.Controllers
                 timestamp = DateTime.UtcNow
             });
         }
+        protected IActionResult OkMessageResponse( string message )
+        {
+            return Ok(new
+            {
+                success = true,
+                message,
+                timestamp = DateTime.UtcNow
+            });
+        }
 
         protected IActionResult ErrorResponseDto(string message, int statusCode = 400)
         {

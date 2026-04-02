@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Ecommerce.Application.Common.Responses;
 using Ecommerce.Application.DTOs.Auth;
 using Ecommerce.Application.DTOs.Common;
@@ -23,7 +24,7 @@ namespace Ecommerce.API.Controllers
         {
             await _authService.RegisterAsync(dto);
 
-            return OkResponse("Register success");
+            return OkMessageResponse("Register success");
         }
 
         [HttpPost("login")]
@@ -63,7 +64,21 @@ namespace Ecommerce.API.Controllers
             }
 
             await _authService.LogoutAsync(userId, accessToken);
-            return OkResponse("Logged out successfully");
+            return OkMessageResponse("Logged out successfully");
+        }
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            // Lấy UserId từ Claims 
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            await _authService.ChangePasswordAsync(userId, request);
+
+            return OkMessageResponse("Password changed successfully. Please log in again with your new password.");
         }
     }
 }
